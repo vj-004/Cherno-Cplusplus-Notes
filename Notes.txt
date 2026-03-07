@@ -1,0 +1,136 @@
+References: Syntaxical sugar, using for creating an alias for a variable.
+
+Class: Syntaxical sugar, used to make the life of programmers easy (helps us write clean code)
+
+Methods in a class/struct: non-static methods in a class get a instance of the class as parameter by default, but static methods don't get this parameter, so they cannot access non-static members of the class.
+
+Constructors: If you don't want anybody to be able to instanciate a class, you can create an empty constructor as a private method or you can write "class_name() = delete;" under public and you can't instanciate your class anymore.
+
+Inheritance: If a class B inherits from another class A, then class B also "is of type A". This means that class B can also used as class A while passing in functions because class B is garenteed to have all the (public) functionality that A has.
+
+Virtual Functions: they introduce something called dynamic dispatch which compilers implement using something called a V-table. It is a table which maps all the virtual function inside our base class so that we can map them to the correct overwritten function in run time.
+
+Virtual Functions aren't free, there are 2 run time costs associated with it:
+1) Initial memory to store the v-table
+2) Every time we call a virtual function, we need to look through the table to check to which function we acutally map
+(cost is negligible until its not)
+
+Interface: It is a class which only consists of unimplemented methods (a template of sorts)
+So you can't instantiate an interface class
+Interfaces are just classes in C++
+
+"<=" and ">=" are slower than "<" and ">" respectively because the former have to do 2 comparisions while the later only do 1. ( "<=" eqals "< or =")
+
+Arrays:
+2 ways to define it:
+    1) Stack: int a[5]
+    2) Heap: int* a = new int[5]    
+
+The array declared in stack will be deleted when the function ends
+but the array declared in the heap will be deleted when the program terminates unless you delete it before that
+
+You can delete the array in heap by doing :  delete[] a
+
+Creating an array on the heap causes a memory indirection which means that the variable points to another pointer which points to the data which is a performance hit
+
+If you create an array in the heap, then you can "never" retreive the size of the array. Although when you delete this array the compiler needs to know the size of the array so there should be some way to get it right, the things is that it is compiler dependent for example some compilers may store it at a "-1" index of the array, its just not reliable enough to use it.
+
+So you can "never" retreive the size of the array allocated in heap
+
+When you allocate an array on the stack its size must be a compiled time known constant otherwise you will get an error* Cherno: "There are ways around this cuz its C++ but yeah" 
+
+In C++ 11 there is a standard array which is allocated in heap and you can do variable_name.size() to get the size of the array.
+eg: std::array<int, 5> arr;
+int size_arr = arr.size();
+(It does have its own overhead though)
+
+Strings: in normal strings each character take 1 byte of memory but if you look at wstrings (wide strings) each charater has 2 byte of memory
+
+char* name = "Vayun"
+ you can't delete this pointer using "delete name" or "delete[] name" 
+
+General rule of thumb:  if you don't use the new keyword, don't use the delete keyword
+
+when you write something between double quoter "" , then by default it becomes a const char pointer (not a stirng)
+this is also the reason why you can't write  string s = "Vayun"  + "Jain";  
+you could do  string s = string("Vayun") + "Jain"
+
+string::npos is an illeagal position in the string
+
+the std library in C++ actually has a library called basic string which is template class and std::string is a templated version of the basic string class which is templated with char (called template specialization)
+
+String literals:
+"Vayun"; is a string literal, its is a const char* with a length of 6, because there is a null character in the end
+
+char name* = "Vayun";
+name[2] = 'z';
+This is undefined behaviour, private compilers will give error on this code but MSVC will compile it just fine.
+
+In debug mode this will through an error, in release mode if you print it after changing, it will still retain its original data ("Vayun" instead of "Vazan")
+Just use a const char* pointer when you are defining a string literal 
+
+*This happenes because string literals are always stored in the read only memory of the program.
+
+If you use a array though, you won't run into this trouble
+char name[] = "Vayun"
+name[2] = 'z'
+
+Here also "Vayun" is stored in read only memory as a string literal, and it is coppied into the array space and then you are manipulating it
+
+some more char datatypes:
+
+1. wchar_t is a wide charater data type 
+
+         const wchar_t* name2 = L"Vayun";
+
+2. const char16_t* name3 = u"Vayun"  (2 bytes per character)
+
+3. const char32_t* name3 = U"Vayun" (4 bytes per character)
+
+const char* name = "Vayun" could also be written as const char* name = u8"Vayun"   (1 byte per character)
+the number of bytes each character takes in different types is for the compiler to decide
+
+const char* para = R"Line 1
+Line 2
+Line 3";  (when you add a R before the string literal it basically ignores special characters in the string, R stands for Raw)
+
+we could also do
+
+const char* para1 = "Line1\n"
+"Line2\n"
+"Line3\n";
+
+CONST in C++:
+
+It is a like a promise, it is a promise that something will be constant. But like in real life, there are ways to break this promise
+It also help us enforce certain rules of the developer who will working with the code
+
+int* a = new int;
+Here you can change the contents of a and also you can change the address, the variable a is pointing to
+
+const int* a = new int;
+Here you cannot change the contents of a but you can change the address, the variable a is pointing to
+
+int* const a = new int;
+Here you can change the contents of a but you cannot change the address. the variable a is pointing to
+
+int const* a = new int;
+
+is the same as const int* a = new int;
+
+const int* const a = new int;
+Here you cannot change the contents of a and you also cannot change the address, the variable a is pointing to
+
+
+given this code snippet:
+
+class Entity{
+ private:
+  int m_x, m_y;
+ 
+ public:
+  int GetX() const {  //  making this fucntion const means that this function will not change anything in the class (it won't change the class)
+   return m_x // I can't set m_x = 2 here because that would change the class
+  }
+
+}
