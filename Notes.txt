@@ -127,10 +127,33 @@ given this code snippet:
 class Entity{
  private:
   int m_x, m_y;
+  mutable int var; // why we mark it mutable is written later on (line 157)
  
  public:
   int GetX() const {  //  making this fucntion const means that this function will not change anything in the class (it won't change the class)
-   return m_x // I can't set m_x = 2 here because that would change the class
+    var = 2;
+    return m_x // I can't set m_x = 2 here because that would change the class
   }
 
 }
+
+
+
+int* m_x, m_y;
+Here only m_x is a pointer, m_y is still an interger
+
+int* m_x, *m_y;
+Here both m_x and m_y are pointers
+
+Given that entity class, if I create a function like
+
+void PrintEntity(const Entity& e){   // using a const referece here means that we won't be copying the entity class. and since it is a "const" we can't change the entity (ie. we can't change its contents)
+    cout << e.GetX() << '\n';
+}
+
+If we removed the const from the GetX() function in the Entity class, you won't be allowed to call the GetX() function, since potentially that function can change the contents of the entity.
+So if a function is a read only function it is adviced to also make it const so that later on if someone is calling that funtion using a const reference they have access to your function
+
+Lets say we want to mark the function as const in the class but we really also want to change var in the function maybe for debugging, here we can use the keyword "mutable", this allows us to change var even in a function that is const
+
+
