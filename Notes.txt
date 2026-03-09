@@ -156,4 +156,102 @@ So if a function is a read only function it is adviced to also make it const so 
 
 Lets say we want to mark the function as const in the class but we really also want to change var in the function maybe for debugging, here we can use the keyword "mutable", this allows us to change var even in a function that is const
 
+Mutable:
+
+When you are dealing with a lambda function, sometimes you pass a variable by value, if you do this you cannot modify it, but what if you do want to modify a variable, in that case you make the lambda function to be mutable.
+
+*We will learn lambda functions later
+* This is a rare use case of the mutable keyword ( not usually used in code)
+int x = 8;
+auto f = [=](){
+  x++;  // this will give an error
+  cout << x << endl;
+}
+
+
+int x = 8;
+auto f = [=](){ mutable
+  x++;  // this will not give an error
+  cout << x << endl;
+}
+
+
+Member Initializer Lists in C++ : 
+
+class Entity{
+
+  private: 
+    string m_Name;
+    int m_Score;
+
+  public:
+    Entity()
+      : m_Name("Vayun"), m_Score(0)
+    {
+
+    }
+
+    Entity(const string& name) : m_Name(name)
+    {
+
+    }
+}
+
+Instead of initializing them inside the constructor function, you can put a " : " and then Initialize the member variables before starting the function definaiton, this is called Member Initializer List (MIL)
+
+The initialization should be in the order in which they are declared. (The member variables are initialized in the same order they are declared if you don't follow the order while initializing them as a MIL).
+
+What difference does it make?
+1) One of the difference is that it helps keeps your code clean, you can write all you initializations outside the function in a line, this way you can clearly see what the function is actually doing.
+2) There is also a difference functionally and this difference applies to classes specifically,  
+
+class Example{
+  public:
+    Example(){
+      cout<<"created an example\n";
+    }
+    Example(int x){
+      cout<<"created an example with "<<x<<"!"<<'\n';
+    }
+}
+
+class Entity{
+  Example m_Example;
+  Entity(){  
+    m_Example = Example(8); 
+  }
+}
+
+Here you will be calling the Example class twice, the output will be:
+created an example
+created an example with 8!
+
+When you are declaring the example class, the default constructor is called there. Thus we have created 2 objects(of Example) instead of 1, so there is a performance issue
+
+while if we did,
+
+
+class Entity{
+  Example m_Example;
+  Entity() : m_Example(Example(8))
+  {  
+  }
+}
+
+or 
+
+class Entity{
+  Example m_Example;
+  Entity() : m_Example(8)
+  {  
+  }
+}
+
+In both these cases you will crete only one instance of the example class
+
+* You should be using member initializer lists everywhere
+
+
+
+
 
