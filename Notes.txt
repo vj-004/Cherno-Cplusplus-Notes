@@ -8,12 +8,13 @@ Constructors: If you don't want anybody to be able to instanciate a class, you c
 
 Inheritance: If a class B inherits from another class A, then class B also "is of type A". This means that class B can also used as class A while passing in functions because class B is garenteed to have all the (public) functionality that A has.
 
+A function is made virtual in a class if a derived class may override it.
 Virtual Functions: they introduce something called dynamic dispatch which compilers implement using something called a V-table. It is a table which maps all the virtual function inside our base class so that we can map them to the correct overwritten function in run time.
-
 Virtual Functions aren't free, there are 2 run time costs associated with it:
 1) Initial memory to store the v-table
 2) Every time we call a virtual function, we need to look through the table to check to which function we acutally map
 (cost is negligible until its not)
+When we declare a PURE VIRTUAL function, we are forcing the derived class to implement it.
 
 Interface: It is a class which only consists of unimplemented methods (a template of sorts)
 So you can't instantiate an interface class
@@ -252,6 +253,48 @@ In both these cases you will crete only one instance of the example class
 * You should be using member initializer lists everywhere
 
 
+How to CREATE/INSTANTIATE OBJECTS in C++:
 
+We have 2 choices to do this and the difference between the 2 choices is where the memory comes from.
+When ever we create an object in C++, it needs to occupy some memory. Even an object with 0 member variables and 0 member functions still occupies at least 1 byte of space.
+
+We as a programmer have the ability to create objects either on the stack or on the heap, both have their own functional differences.
+For example stack objects have an automatic lifespan, thier life time is controlled by the scope they are declared in.
+
+Stack:
+
+class Entity{
+  string m_Name;
+  Entity(): m_Name("Unknown"){  
+  }
+  Entity(const string& name): m_Name(name){  
+  }
+}
+
+Entity entity_a;
+Entity entity_b("Vayun");
+
+Entity entity_c = Entity("Vayun");
+
+entity_a, entity_b, entity_c are valid objects of the class Entity created in the stack memory. (In languages such as Java you would get a NULL pointer exception, but in C++ this is totally valid)
+
+*Whenever possible always use the stack space. ( This is the fastest / "most managed" way in C++ to instantiate objects) 
+
+Heap:
+
+Entity* entity = new Entity("Vayun")
+
+The main difference here is not the pointer which a lot of a people mistake, its actually the "new" keyword.
+Allocating on the Heap is bad for performance.
+When you allocate memory on the heap, you need to manually free the memory you have allocated.
+
+delete entity;
+
+If you the "new" keyword to create something, it is allocated on the heap and you need to use the "delete" keyword.
+
+*Create objects/anything on the stack unless you absolutely can't.
+
+
+The NEW Keyword in C++:
 
 
