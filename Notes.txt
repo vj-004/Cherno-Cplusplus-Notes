@@ -271,12 +271,12 @@ class Entity{
   }
 }
 
-Entity entity_a;
+Entity entity_a; // (In languages such as Java you would get a NULL pointer exception, but in C++ this is totally valid)
 Entity entity_b("Vayun");
 
 Entity entity_c = Entity("Vayun");
 
-entity_a, entity_b, entity_c are valid objects of the class Entity created in the stack memory. (In languages such as Java you would get a NULL pointer exception, but in C++ this is totally valid)
+entity_a, entity_b, entity_c are valid objects of the class Entity created in the stack memory. 
 
 *Whenever possible always use the stack space. ( This is the fastest / "most managed" way in C++ to instantiate objects) 
 
@@ -286,7 +286,7 @@ Entity* entity = new Entity("Vayun")
 
 The main difference here is not the pointer which a lot of a people mistake, its actually the "new" keyword.
 Allocating on the Heap is bad for performance.
-When you allocate memory on the heap, you need to manually free the memory you have allocated.
+When you allocate memory on the heap, you need to manually free the memory you have allocated. (it is also automatically deleted when the program ends)
 
 delete entity;
 
@@ -297,4 +297,48 @@ If you the "new" keyword to create something, it is allocated on the heap and yo
 
 The NEW Keyword in C++:
 
+NEW is keyword is used to get memory on the heap.
+When you use the new keyword, it find for a continuous block of memory of the size x which is based on what you asked for. 
+It then returns a pointer to that memory address.
 
+When you call NEW it takes time.
+
+int a = 2; // in stack
+int* b = new int // allocated in heap
+
+int *c = new int[50]; // 200 bytes of memory, allocated in heap
+
+Entity* e = new Entity; // This only get the memory for a Entity Class
+
+Entity* e1 = new Entity(); // we have called the Entity Constructor also here 
+
+NEW is just an operator, which means you overload the operator and change its behaviour
+
+"Generally" under the hood NEW is implemented using the malloc function.
+
+Entity *e = (Entity*)malloc(sizeof(Entity)); // This is same as line 311
+*This doesn't call the Entity constructor.
+Usually you don't allocate memory in C++ like this, in some cases you might want to use this.
+
+*Whenever you use the new keyword, you must remember to also use delete.
+
+delete e;
+
+delete is also an operator. delete also called the destructor of the class.
+
+"Generally" under the hood DELETE is implemented using the free function.   
+
+When we use [] brackets with new, for eg:
+int* b = new int[50]
+new[] is also another operator, so when you want to delete this memory you call
+delete[] b;
+
+Placement NEW:
+Using this you can decide where the memory comes from.
+You are not allocating memory in this case, rather you are calling the constructor and initializing you entity in a specific memory adderess.
+
+int* b = new int[50] // 200 bytes
+
+Entity* e = new(b) Entity(); // This works if Entity is less than 200 bytes
+
+Implicit Conversion and the Explicit Keyword in C++: 
