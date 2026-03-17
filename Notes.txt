@@ -342,3 +342,69 @@ int* b = new int[50] // 200 bytes
 Entity* e = new(b) Entity(); // This works if Entity is less than 200 bytes
 
 Implicit Conversion and the Explicit Keyword in C++: 
+
+class Entity{
+  private:
+    std::string m_Name;
+    int m_Age;
+  public:
+    Entity(const std::string& name) m_Name(name) m_Age(-1): {} 
+    Entity(int age) m_Name("Unknown") m_Age(age): {} 
+}
+
+void Print(Entity& entity){
+  // Printing something
+}
+
+int main(){
+
+  Entity a("Vayun");
+  Entity b(22);
+
+  // This works, but what you can also do is
+
+  Entity a = "Vayun"; // C++ Implicitly converts this too match the type in Entity Constructor if possible.
+  Entity b = 22; // C+ + Implicitly converts the integer and the string to an Entity type based on the constructor.
+
+  Print(22); // This also works because C++ can find the constructor for Entity class which takes an integer so it Implicitly converts it to an Entity type
+  // *Print("Vayun");* You would expect this also to work but this gives an error, becasue the Entity constructor expects a const std::string but this is a const char[6]
+  // For this to work C++ would have to do 2 implicit conversions, one from const char[] into a string and then from string to entity, but C++ is allowed to do only 1 implicit conversion
+
+  Print(std::string("Vayun")); // This would work becasue C++ needs to do only 1 implicit conversion
+  Print(Entity("Vayun")); // This also works.
+}
+
+If we define print as
+
+void Print(const Entity& entity){
+  //Printing
+}
+
+Then C++ can do multiple implicit conversions, so 
+Print("Vayun") would work in this case;
+
+C++ does NOT allow multiple implicit conversions for function arguments when binding to a non-const reference.
+
+Entity a = "Vayun";
+This involes a copy constructor, so even though "Vayun" is a const char[], it still converts it into a const std::string
+
+C++ rule:
+In copy initialization, the compiler is allowed to:
+  Use a constructor
+    And perform conversions to match that constructor’s parameter
+
+There is something called the explicit keyword which prevents implicit conversion, you put explicit keyword before a constructor
+
+class Entity{
+  private:
+    std::string m_Name;
+    int m_Age;
+  public:
+    explicit Entity(const std::string& name) m_Name(name) m_Age(-1): {} 
+    Entity(int age) m_Name("Unknown") m_Age(age): {} 
+}
+
+Entity a = "Vayun"; // This would fail
+Entity b = 22; // This would not fail becasue the constructor for this is not explicit.
+
+
