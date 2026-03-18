@@ -407,4 +407,73 @@ class Entity{
 Entity a = "Vayun"; // This would fail
 Entity b = 22; // This would not fail becasue the constructor for this is not explicit.
 
+OPERATORS AND OPERATOR OVERLOADING IN C++:
 
+The comma (",") and the "()" can also be operators
+Operators are basically functions which help you clean up your code. Instead of giving your fucntion a name like add you can use an operator "+"
+Using operating overloading should be minimal and you should only use it when it makes sense
+If people need to see defination of what the operator does when you overload an operator then there is not point in overloading it.
+
+struct Vector2{
+  float x,y;
+
+  Vector2(float x, float y) : x(x), y(y) {}
+
+  Vector2 Add(const Vector2& operand) const{
+    return Vector2(x + operand.x, y + operand.y);
+  }
+
+  Vector2 operator+(const Vector2& operand) const {
+    return Add(other);
+  }
+
+  Vector2 Multiply(const Vector2& operand) const{
+    return Vector2(x * operand.x, y * operand.y);
+  }
+
+  Vector2 operator*(const Vector2& operand) const {
+    return Multiply(other);
+  }
+
+  bool operator==(const Vector2& operand) const {
+    return x == other.x && y == other.y;
+  }
+
+  bool operator!==(const Vector2& operand) const {
+    // return !operator==(other); // Both of them are correct based on the coding style
+    return !(*this == other); 
+  }
+
+}
+
+Vector2 position(4.0f, 4.0f);
+Vector2 speed(0.5f, 1.5f);
+Vector2 powerup(1.1f, 1.1f);
+
+Vector2 result1 = position.Add(speed.Multiply(powerup)); // without operator overloading, it gets hard to read and write
+Vector2 result2 = position +  speed * powerup;
+
+if(result1 == result2){ // This works
+  // some code
+}
+
+
+In this case the opertor+ is calling the Add function, we could make the Add function call the operator+
+
+Vector2 Add(const Vector2& operand) const{
+   // return *this +  operand;  We can do it this way also
+   return opertor+(operand);   
+}
+
+Vector2 operator+(const Vector2& operand) const {
+  return Vector2(x + operand.x, y + operand.y);
+}
+
+std::cout << result2 << std::endl; // This doesn't work because result2 is a data type which cout doesn't handle
+
+std::ostream& operator<<(std::ostream& stream, const Vector2& other){
+  stream << other.x << " , " << other.y;
+  return stream;
+}
+
+We have overloaded the "<<" operator.
