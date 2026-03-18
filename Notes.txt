@@ -477,3 +477,52 @@ std::ostream& operator<<(std::ostream& stream, const Vector2& other){
 }
 
 We have overloaded the "<<" operator.
+
+The "this" keyword in C++:
+
+It is only accessable to us through a non static member function
+"this" is a pointer to the current object instance that the method belongs to.
+
+void PrintEntity(Entity* e);
+
+void PrintEntity1 (const Entity& e);
+
+class Entity{
+  public:  
+    int x,y;
+    Entity(int x, int y){ // We could use a member initializer list but lets say we don't want to then we are faced with an issue.
+
+      // x = x; doesn't make sense;
+      Entity* e = this; // That is the type of this.
+      e->x = x;
+      this->x = x;
+      (*this).x = x;
+
+      this->y = y;
+
+      // What if I want to pass an this Entity object into the PrintEntity function, I could do,
+
+      PrintEntity(this);
+      PrintEntity1(*this);
+
+      // You could do some bizarre things like,
+      delete this; // People do this in very very specialized cases. Avoid whenever possible.
+
+    }  
+
+    int GetX() const {
+      const Entity* e = this;
+    }
+}
+
+void PrintEntity(Entity* e){
+  // some code
+}
+
+void PrintEntity1(cosnt Entity& e){
+  // some code
+}
+
+Entity* e = this; // when you hover over e, you will see it is a Entity* const, so we should write Entity* const e, but most people don't because then you can't change the address the this pointer is poinitng to. 
+
+If we have a const function, this is actually not just an Entity* but it is a const Entity* , since const means that we can't change the class, which aligns with what we have done.
