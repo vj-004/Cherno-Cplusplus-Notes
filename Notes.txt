@@ -526,3 +526,30 @@ void PrintEntity1(cosnt Entity& e){
 Entity* e = this; // when you hover over e, you will see it is a Entity* const, so we should write Entity* const e, but most people don't because then you can't change the address the this pointer is poinitng to. 
 
 If we have a const function, this is actually not just an Entity* but it is a const Entity* , since const means that we can't change the class, which aligns with what we have done.
+
+Object Lifetime in C++: 
+
+You can create a scope using 
+{ // scope starts here
+
+} // your scope ends here
+
+Any variable which is initialized in a stack inside this scope will get destroyed when the scope ends.
+
+Scoped Pointer (kind of a implementation of a unique pointer)
+class ScopedPtr{
+  private:
+    Entity* m_Ptr;
+  public:
+  ScopedPtr(Entity* ptr): m_Ptr(ptr) {}
+  ~ScopedPtr(Entity* ptr){
+    delete m_Ptr;
+  }
+};
+
+{
+  ScopedPtr e = new Entity();
+}
+
+Even though we create Entity class on the heap, when the scope ends the memory is freed. ScopedPtr object is created on the stack.
+
