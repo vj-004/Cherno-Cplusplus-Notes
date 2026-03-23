@@ -553,3 +553,61 @@ class ScopedPtr{
 
 Even though we create Entity class on the heap, when the scope ends the memory is freed. ScopedPtr object is created on the stack.
 
+SMART POINTERS in C++:
+
+When you create a SMART POINTER and you "make" it, it will call new and will allocate a memory for you and then based on which SMART POINTER you use that memory will at some point be automatically be freed.
+
+To get access to smart pointers you will have to
+#include<memory> 
+
+std::unique_ptr : when this pointer goes out of scope, it will get destroyed and it will call delete (destructor of the object I think)
+You can't copy unique_ptr, because if one of them gets destroyed the memory it was pointing to gets freed and the second unique_ptr is not pointing to anything.
+
+
+{
+  // std::unique_ptr<Entity> entity = new Entity() gives you an error, because the constructor of the unique_ptr (in its defination) is defined as explicit.
+  std::unique_ptr<Entity> entity(new Entity());
+
+  // you can use the unique_ptr to access methods in the object like any other ptr
+  entity->function_name();
+
+  // The preffered way to initialize the unique_ptr is to use make_unique
+  std::unique_ptr<Entity> entity2 = std::make_unique<Entity>();  // this is important for unique_ptr because of something called exception safety 
+}
+
+unique_ptr is the simplest smart pointer that we have, it has very low overhead.
+The problem with this is you can't copy/share this pointer, like passing it onto a function or have another class store it, you will run into a problem because you cannot copy it.
+
+std::shared_ptr : The way the shared_ptr is implemented is upto the compiler / standard library which you are using with your compiler. But mostly in places it uses something called reference counting.
+
+{
+  std::shared_ptr<Entity> e0;
+  {
+  
+    // std::shared_ptr<Entity> sharedEntity(new Entity())  this can also be done but this shouldn't be used, because shared pointer has to allocate an another block of memory called a control block where it stored the reference count. 
+    // If you first create a new Entity and then pass it into the shared pointer constructor, it is allocating memory twice while by using the make_shared it does that together which is a lot more efficient
+
+    std::shared_ptr<Entity> sharedEntity = std::make_shared<Entity>();
+    e0 = sharedEntity; // This increases the ref count. 
+
+    std::weak_ptr<Entity> weakEntity = sharedEntity; // This is also a shared pointer but this does not increase the ref count which we talked about in line 581.
+
+
+  }
+  // the memory at which sharedEntity is pointing is not yet freed because e0 is still holding a reference to that entity.
+
+}
+
+When all the stack allocated shared_ptr for a memory are gone then and only then that memory is freed.
+When you assingn a shared pointer to another shared pointer thus copying it, it will increase the ref count,
+but when you assign it to a weak pointer (weak_ptr) it will not increase the ref count.
+
+You can ask a weak pointer, are you still valid? , are you expired?
+
+You should try to use SMART POINTERS ALL THE TIME, they automate your memory management, they prevent you from accidently leaking memory by forgetting to call delete.
+Shared pointer definitely has some overhead because of its reference counting system.
+
+You should prefer using unique_ptr first than shared_ptr. If you can complete you task using unique_ptr then don't use shared_ptr.
+
+
+Copying and Copy Contructors in C++ :
