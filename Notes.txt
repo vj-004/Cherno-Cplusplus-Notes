@@ -76,7 +76,7 @@ If you use a array though, you won't run into this trouble
 char name[] = "Vayun"
 name[2] = 'z'
 
-Here also "Vayun" is stored in read only memory as a string literal, and it is coppied into the array space and then you are manipulating it
+Here also "Vayun" is stored in read only memory as a string literal, and it is copied into the array space and then you are manipulating it
 
 some more char datatypes:
 
@@ -611,3 +611,81 @@ You should prefer using unique_ptr first than shared_ptr. If you can complete yo
 
 
 Copying and Copy Contructors in C++ :
+
+struct Vector2{
+  float x,y;
+}
+
+Vector2 a = {2,3};
+Vector2 b = a; // A new copy of Vector2 {2,3} is created.
+b.x = 4; // This changes the value of b only a = {2,3}
+
+Vector2* c = new Vector2(); 
+Vector2* d = c; // you are still copying the Vector2* but you are not copying the whole object.
+
+When ever you use the assignment operator you are always copying values (unless its References).
+
+class String{
+
+  private:
+    char* m_Buffer;
+    unsigned int m_Size;
+  public:
+    String(const char* string){
+      m_Size = strlen(string);
+      m_Buffer = new char[m_Size+1]; // +1 to include the null termination character
+      memcpy(m_Buffer, string,m_Size); // we can write m_Size+1 here but we are not sure if const char* string has a null termination character of not.
+      m_Buffer[m_Size] = 0;
+    }
+
+    ~String(){
+      delete[] m_Buffer;
+    }
+
+    char& operator[](unsigned int index){
+      return m_Buffer[index];
+    }
+
+    friend std::ostream& operator<<(std::ostream& stream, const String& string);
+
+    // lets create a copy constructor, which is called when you copy the object.
+    String(const String& other) : m_Size(other.m_Size) { // By default this is provided by C++ and it just uses memcpy (shallow copy by default).
+      
+      // deep copy
+      m_Buffer = new char[m_Size + 1]; 
+      memcpy(m_Buffer, other.m_Buffer, m_Size + 1);
+
+    }
+
+    // String(const String& other) = delete; If you don't people to copy you objects of this class. This is how copy constructor of the unique_ptr class is implemented
+
+}
+
+std::ostream& operator<<(std::ostream& stream, const String& string){
+  stream << string.m_Buffer;
+  return stream;
+}
+
+int main(){
+
+  String string = "Cherno";
+  String second = string;
+
+  second[2] = 'a; // Without the copy constructor, both string = "Charno" and second = "Charno". It looks like we have copied string to second but since we copied a pointer it not working like we thought
+
+  std::cout<< string << std::endl;
+  std::cout<< second << std::endl;
+
+}
+
+
+Without the copy constructor, when you assign second = string, it creates a copy of string which means that the char* is also copied. Both m_Buffer in string and in second point to the same memory address.
+Because of this when you run the program, it will crash because when string's destructor is called it frees the m_Buffer memory and then when second's destructor is called it tries to free a memory which is already freed.
+
+We can talk about this in terms of deep copy and shallow copy.
+
+Always pass you objects by const reference to avoid unneseccary copying.
+
+
+The Arrow Operator in C++ :
+
