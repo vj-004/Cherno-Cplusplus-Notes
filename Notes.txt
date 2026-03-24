@@ -689,3 +689,32 @@ Always pass you objects by const reference to avoid unneseccary copying.
 
 The Arrow Operator in C++ :
 
+when you have a ptr to an object,
+Entity* e = new Entity();
+
+you can't access function in Entity object like this : e.Print(), because e is a pointer.
+
+Instead we use arrow operator.
+e->Print();
+
+This is the default use case of the arrow operator.
+
+You can overload and use it your own custom class.
+
+Bonus Usecase:
+
+struct{
+  float x,z,y;
+};
+
+based on the order I define the variables they will have a different offset from a certain reference. Lets say we want to find that offset.
+
+((Vector3*)0)->x , this tries to give a piece of some invalid memory
+&((Vector3*)0)->x , take the memory address of that x (also can be written as &((Vector3*)nullptr)->x) ,
+(int)&((Vector3*)0)->x , now we have casted the memory into a regular int.
+
+int offset = (int)&((Vector3*)0)->x;
+
+offset = 0 for x,
+offset = 4 for z,
+offset = 8 for y. because size of float is 4 bytes.
