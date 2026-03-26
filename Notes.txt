@@ -718,3 +718,74 @@ int offset = (int)&((Vector3*)0)->x;
 offset = 0 for x,
 offset = 4 for z,
 offset = 8 for y. because size of float is 4 bytes.
+
+Dynamic Arrays in C++ (std::vector) : 
+
+Dynamic arrays are arrays in the sense that their memory is contigous. 
+When you have to resize a dynamic array. It finds a memory of a larger size and copies the original content to the new location and deletes the old memory, then keeps adding data.
+
+Optimizing the usage of std::vector in C++:
+
+We will basically try to optimize the part where std::vector has to resize itself, it needs to copy information from the old memory to the new memory.
+This is only 1 cause of slow code but we will talk about optimizing this right now.
+How can we avoid copying our objects if we are dealing with vectors (specifically object based vectors).
+
+*Knowing your environment is the most important things with optimization.*
+
+We need to know when copies actually happen and why they happen.
+
+class Vertex{
+  private: 
+    float x,y,z;
+  
+  public:  
+    Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
+
+    Vertex(const Vertex& vertex) : x(vertex.x),z(vertex.z),z(vertex.z) {
+      std::cout<<"Copied"<<std::endl;
+    }  
+
+};
+
+
+int main(){
+
+  std::vector<Vertex> vertices;
+  vertices.push_back(Vertex(1,2,3));
+  vertices.push_back(Vertex(4,5,6));
+  vertices.push_back(Vertex(7,8,9));
+
+}
+
+This outputs "Copied" 6 times.
+
+1. When we do Vertex(1,2,3) we are creating the Vertex object in the main() functions stack frame and then we copy it into the vertices vector. 
+We can avoid doing this copy by directly creating the object inside the vertices vector.
+
+So that's 3 copies.
+
+2. When we insert the second element, the vector needs to resize from 1 to 2, so it needs to copy the first Vertex object. simillarly when we insert the third element the vector needs to resize from 2 to 3.
+We need to copy both the first element and the second element into a new memory location.
+
+Thus we have accounted for the 6 copies we are creating.
+
+By "knowing your environment", we can tell the vector class how much space we might need and allocate that amount of memory before hand.
+
+To tackle the 2. issue, we can use the reserve keyword.
+
+std::vector<Vertex> vertices;
+vertices.reserve(3); // this is different from the resize function and just doing std::vector<Vertex> vertices(3) because reserve doesn't build the Vertex objects for each and every location.
+
+To tackle the 1. issue, we use emplace_back instead of push_back, this creates the Vertex object at the location of the vector and not in the main() stack frame.
+
+vertices.emplace_back(1, 2, 3); // yes you do not explicitly say that create a Vertex class, it does it automatically.
+
+int main(){
+  std::vector<Vertex> vertices;
+  vertices.reserve(3);
+  vertices.emplace_back(1,2,3);
+  vertices.emplace_back(4,5,6);
+  vertices.emplace_back(7,8,9);
+}
+
+This is the code with 0 copies.
