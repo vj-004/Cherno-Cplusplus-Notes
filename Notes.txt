@@ -789,3 +789,37 @@ int main(){
 }
 
 This is the code with 0 copies.
+
+Local Static in C++:
+
+This is one other context you might find the static keyword in.
+You can use static in a local scope to declare a variable and that has a bit of a different meaning than the previous context of static we have looked at.
+Consider the lifetime of the variable and the scope of the variable when thinking about this context.
+
+A static local variable allows us to declare a variable that has a lifetime of our entire program however a scope which is limited to the one it is defined in.
+
+void Function(){
+  static int i = 0;
+  i++;
+  std::cout<<i<<std::endl;
+}
+
+int main(){
+
+  Function(); // i = 1
+  Function(); // i = 2
+  Function(); // i = 3
+  Function(); // i = 4
+
+}
+
+Another use case is in Singleton class (this class can have only one instance)
+
+class Singleton{
+  public:
+    static Singleton& Get(){
+        static Singleton instance;
+        return instance;
+    }
+};
+
