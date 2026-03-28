@@ -823,3 +823,28 @@ class Singleton{
     }
 };
 
+Libraries in C++ (Static Linking):
+
+Static linking means that the library gets put into your executable. It is inside you executable file. A dynamic library gets linked in the run time.
+Static linking is technically faster, as linking optimizations and other optimizations can be applied.
+
+To link a library you need to main things which is the include folder which holds all the header files and the library file, which holds all the definations to those headers.
+So create a folder called dependencies and inside this create a separate folder for each library, in each library folder add the include and the lib folder for that particualr library.
+
+In the lib folder of your library. You will have,
+library_name.dll : extension is the runtime dynamic link library. 
+library_namedll.lib : this is the static we use with the dll so that we don't have to ask the dll "hey can I please a bunch of function pointers to all of these functions". This lib file contains all of the location of the functions and symbols of the library.
+library_name.lib : static library. This is what we link if we don't want compile time linking
+
+when you do #include do you use angular brackets (<>) or quotes(""). There is no difference but "" will checko you relative path first and if it doesn't find anything then it will look in the compiler include paths.
+How Cherno uses it? If the library file is inside the folder where you are writing code, then use quotes (""), if it is completely external then use angular brackets (<>).
+
+
+Using Dynamic Libraries in C++:
+
+Dynamic linking is linking that happens at run time.
+In dynamic linking instead of adding library_name.lib to the linker path. We add library_namedll.lib to the linker path. We also need to place the library_name.dll file in the same folder as the executable.
+Some libraries do not support includeing the same header file for both static and dynamic linking. So keep that in mind too.
+
+
+
