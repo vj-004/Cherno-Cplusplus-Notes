@@ -846,5 +846,71 @@ Dynamic linking is linking that happens at run time.
 In dynamic linking instead of adding library_name.lib to the linker path. We add library_namedll.lib to the linker path. We also need to place the library_name.dll file in the same folder as the executable.
 Some libraries do not support includeing the same header file for both static and dynamic linking. So keep that in mind too.
 
+How to Deal with Multiple Return Values in C++:
+
+You can create a struct with all the different variable type you need to return. And then use this struct as a type.
+Another way is to pass the variables by reference. And when returning we can just update those reference variables. This is one of the most optimal way.
+You could also send a pointer instead of a reference. You can do things which you couldn't do with reference (like passing null).
+
+If the types of return types are same you could return an array of the variables. In this way, when returning you will have to heap allocate the memory which is already bad.
+
+std::arrays are created on the stack while std::vectors are going to store it in its underlying storage in the heap. So techically returining a std::array will be faster than returning std::vector.
+
+Now if you have 2 variables of different types, C++ provided 2 ways of solving this, 1.Tuple ; 2.Pair.
+
+A tuple is a class which can contain x amount of variables and it doesn't care about the types.
+std::tuple<std::string, std::string> tup; // you can add how many ever you want with whatever data type.
+#incldue <tuple> you need to use the tuple.
+
+To return we can do,
+std::make_pair(str1, str2); // you don't need to specify the type because the function return type will handle that for you.
 
 
+std::tuple<std::tring, std::string> function_name(){
+  std::string str1 = "Sample 1";
+  std::string str2 = "Sample 2";
+  return std::make_pair(str1,str2);
+}
+
+//std::tuple<std::string, std::string> result = function_name();
+or 
+auto result = function_name();
+
+To extract data, you need to do,
+
+std::string str1 = std::get<0>(result);
+std::string str2 = std::get<1>(result); // get<index_of_variable>(tuple_name);
+
+For 2 variables, you can use std::pair<std::string, std::string> , the 2 variables can be of different types.
+
+std::pair<std::tring, std::string> function_name(){
+  std::string str1 = "Sample 1";
+  std::string str2 = "Sample 2";
+  return std::make_pair(str1,str2);
+}
+auto result = function_name();
+string str1 = result.first;
+string str2 = result.second;
+
+Best thing to do is create a struct.
+
+struct result_struct{
+
+  std::string str1;
+  std::string str2;
+
+};
+
+result_struct function_name(){
+  std::string str1 = "Sample 1";
+  std::string str2 = "Sample 2";
+  return {
+    str1, str2
+  };
+}
+
+auto result = function_name();
+string str1 = result.str1;
+string str2 = result.str2;
+
+All of them can be used depending on the situation.
