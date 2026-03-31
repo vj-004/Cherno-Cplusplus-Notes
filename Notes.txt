@@ -914,3 +914,72 @@ string str1 = result.str1;
 string str2 = result.str2;
 
 All of them can be used depending on the situation.
+
+
+Templates in C++:
+
+Allows you to define a template that will be compiled by your usage.You get the compiler to write code for you based on a set of rules.
+
+template<typename T>
+void Print(T value){
+  std::cout<< value << std::endl;
+} 
+
+int main(){
+
+  Print(5);
+  Print("5");
+  Print(5.0f);
+
+}
+
+The template is evaluated at compile time. The Print() function isn't actual code. It is not a real function. It only gets created when we actually call it. 
+And when we call it based on how we call it, with what types, does the Print() function get created and compiled as source code.
+
+typename (you can also write this as class) is a type of template parameter. In the angular brackets after template, you write the template parameters.
+T is just a name, it could be anything.
+
+The type can be determined w/o specifying the type then you can directly use Print("5");
+else we can specify it like this:
+
+Print<std::string>("Hello");
+Print<int>(5);
+
+The template code doesn't exists until you call it. So if,
+
+template<typename T>
+void Print(T value){
+  std::cout<< val << std::endl;
+}
+
+int main(){
+
+}
+
+In this case even though the variable val doesn't exists, the code will still compile successfully.
+MSVC compiler won't tell you about errors in templates which you are not using. But some compiler like clang will.
+
+Templates are not limited to types and they are not limited to functions either. 
+
+template<typename T, int N>
+class Array{
+
+private: 
+  T m_Array[N];
+public:
+  int getSize(){
+    return N;
+  }
+};
+
+int main(){
+
+  Array<std::string , 5> arr;
+  std::cout << arr.getSize() << std::endl; 
+
+}
+
+In templates,
+Instead of programming what our code does at run time, we are programming what the compiler will do during compile time.
+
+
