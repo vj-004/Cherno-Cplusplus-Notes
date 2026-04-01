@@ -983,3 +983,45 @@ In templates,
 Instead of programming what our code does at run time, we are programming what the compiler will do during compile time.
 
 
+Stack vs Heap memory in C++:
+
+Stack and Heap are 2 areas which we have in the RAM of the program.
+Stack is typically an area in memory which has a predefined size. Usually around 2Mb or so.
+Heap also starts with a fixed value but it can grow and change as our application goes on.
+The physical location of both of these memories is in the RAM.
+
+int value = 5; // allocated an integer on the stack
+int* hval = new int; // allocated on the heap. We use the new keyword to tell C++ to define it on the heap.
+*hval = 5;
+delete hval;
+
+int arr[5]; // stack
+int* arr = new int[5]; // heap
+delete arr[];
+
+struct Vector3{
+
+  float x,y,z;
+
+};
+
+Vector3 vector; // stack
+Vector3* h_vector = new Vector3();
+delete h_vector;
+
+In stack allocation we just add memory on top of each other like a stack.
+It is extremely fast since it just 1 cpu cycle. We just move the stack pointer and we return the address of that stack pointer.
+Once the scope of the stack allocated memory ends, the memory created in that scoped is poped.
+
+When you allocate on the heap using the new keyword you also need delete it. Like we have discussed before if you use SMART pointers you don't need to call delete manually.
+The new keyword basically calls the underlying function malloc.
+When you start your application you get a certain amount of physical RAM allocated to you, and your program will maintain something called a free list. Which basically keeps track of which blocks of memory are free and where they are and all that.
+And when you ask for heap memory using malloc, it will kind of be able to go through the free list and find a memory that is at least as big is the size of the memory you have requested.
+If you ask for more memory that is actually in that free list then the program will ask the OS for more memory which is very expensive.
+With the heap there is whole lot of book keeping which is also done. You also need to delete the memory.
+
+Essentially the point is that, stack is super fast and heap is slow.
+Always allocated on the stack if possible.
+Unless you want to allocated a large amount of memory (which can't be done on the stack), use the heap.
+The performance difference come strictly from the allocation. So if you were to theoretically pre-allocated 4GB of memory before you ran you program on the heap. And then you were to "heap allocated" from that pre-allocated block of memory.
+It would basically be the same as stack, you would get a few CPU cache misses but there are not enough of them to actually matter. 
