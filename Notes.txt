@@ -1025,3 +1025,34 @@ Always allocated on the stack if possible.
 Unless you want to allocated a large amount of memory (which can't be done on the stack), use the heap.
 The performance difference come strictly from the allocation. So if you were to theoretically pre-allocated 4GB of memory before you ran you program on the heap. And then you were to "heap allocated" from that pre-allocated block of memory.
 It would basically be the same as stack, you would get a few CPU cache misses but there are not enough of them to actually matter. 
+
+Macros in C++:
+
+Macros are evaluated in the pre-processing stage.
+We can replaces text in our code with something else using a macro.
+Its kinda like a find and replace, it can be a find and replace with paramter, arguments and variables. 
+We customize the way we call that macro and what exactly it expands to.
+
+A macro can be defined any where in the program.
+
+#define WAIT std::cin.get()
+#define LOG(x)  std::cout << x << std::endl 
+
+#define MAIN int main() \
+{\
+  std::cin.get() << std::endl;\
+}
+
+MAIN
+
+//int main(){
+  
+  //WAIT; // this is replaced with std::cin.get();
+  //LOG("Hello");
+
+  //return 0;
+//}
+
+When creating multi line macros, don't use the space after the backslash, just press enter, which tells the preprocessor that ignore the enter (new line).
+
+
