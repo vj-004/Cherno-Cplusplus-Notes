@@ -1055,4 +1055,35 @@ MAIN
 
 When creating multi line macros, don't use the space after the backslash, just press enter, which tells the preprocessor that ignore the enter (new line).
 
+The "auto" keyword in C++ (auto as a datatype):
 
+This is a way to let C++ deduce automatically what the type of the data/varaible is in C++.
+
+int a = 5;
+
+//int b = a;
+
+auto b = a; // C++ automatically works out that b has to be an integer.
+C++ "kind of, kind of" turn into a weakly typed language, if we use auto everywhere.
+
+std::string GetName(){
+  return "Vayun";
+}
+
+auto name = GetName(); // even if the GetName function returns a char* which is also valid, I don't need to change the return type of name.
+
+std::string name = GetName(); // This would still work if the function GetName returned a char* because std::string can implicitly take a char*. But you get the point.
+
+int a = name.length(); // Now is we use auto while defining name here and then the function return a char* then this would throw an error since I don't know what the type of name will be. 
+
+If some varaiable has a very long type then using auto makes a lot of sense.
+In this case you could use 
+using SHORT_NAME = LONG_TYPE_NAME;
+
+or
+
+typedef LONG_TYPE_NAME SHORT_NAME;
+
+If your type is like int or string then there is no point in using auto, it makes the code less readable. But for long types it can be very useful.
+
+It is also used for trailing return types.
