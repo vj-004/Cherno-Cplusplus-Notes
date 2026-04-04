@@ -1119,3 +1119,84 @@ So basically std::array has bounds checking if you want to. (in debug mode).
 You would think the std::array probably needs more memory because it needs to store its size, but no, the size is a template argument. There is not variable that stores the length.
 
 You should std::array instead of C styled arrays because it doesn't affect the performance and it also lets you keep track of size and many other features which C styled arrays don't have.
+
+Function Pointers in C++:
+
+We will discuss a raw function pointer which is there in C.
+Function pointers are just a way to assign functions to varibales.
+You can then pass functions into other fucntions.
+
+void HelloWorld{
+  std::cout << "Hello World" << std::endl;
+}
+
+int main(){
+
+  HelloWorld();
+
+  // auto function = HelloWorld(); this won't work since hello world returns void;
+  // auto function = &HelloWorld;
+  auto function = HelloWorld; // not using & also works since there is an implicit conversion.
+
+  function(); 
+  function(); 
+
+  // void(*vayun)() = HelloWorld;
+  void(*vayun)();
+  vayun = HelloWorld;
+
+  vayun();
+  vayun();
+
+}
+
+
+The type of function varaiable is void(*function)(parameters...)
+it can also be void(*vayun)(paramters...)
+So its basically of type: void(*)(parameters...), since anything after the * it is just the name of the variable. 
+void(*variable_name)(parameters...)
+
+
+The best thing to do is to avoid writing such a fancy data type is either to use auto or use typedef.
+
+int main(){
+
+  typedef void(*HelloWorldFunction)();
+  HelloWorldFunction function = HelloWorld;
+
+}
+
+Another example with parameters,
+
+void HelloWorld(int a){
+
+  std::cout << "Hello World! Value: " << a << std::endl;
+
+}
+
+int main(){
+
+  typedef void(*HelloWorldFunction)(int);
+  HelloWorldFunction function = HelloWorld;
+  function(8);
+
+}
+
+A practical example,
+
+void PrintValue(int value){
+  std:: cout << "Value: " << value << std::endl;
+}
+
+void ForEach(const std::vector<int>& values, void(*func)(int)){
+    for (int value: values){
+      func(value);
+    }
+}
+
+int main(){
+  std::vector<int> values = {1,5,4,2,3};
+  ForEach(values, PrintValue);
+}
+
+It is a bit messy to have an extra just floating around so we use something called lambdas.
