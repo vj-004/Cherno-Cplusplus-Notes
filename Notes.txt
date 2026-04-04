@@ -1200,3 +1200,75 @@ int main(){
 }
 
 It is a bit messy to have an extra just floating around so we use something called lambdas.
+
+Lambdas in C++:
+
+It is an anonymous function.
+You can think of it as a throw away function.
+
+void ForEach(const std::vector<int>& values, void(*func)(int)){
+    for (int value: values){
+      func(value);
+    }
+}
+
+int main(){
+  std::vector<int> values = {1,5,4,2,3};
+  ForEach(values, [](int value){ std:: cout << "Value: " << value << std::endl; });
+}
+
+In the [] (capture method) brackets you send in the variable which you want to send into the function from the outside world.
+
+Whenever you have a function pointer, you can use a lambda in C++.
+Lambdas becomes a way to define a function w/o acutally having to DEFINE A FUNCTION.
+
+#include<fucntion>
+
+void ForEach(const std::vector<int>& values, void(*func)(int)){
+    for (int value: values){
+      func(value);
+    }
+}
+
+void ForEach2(const std::vector<int>& values, const std::function<void(int)> func){
+  for (int value: values){
+    func(value);
+  }
+}
+
+int main(){
+
+  std::vector<int> values = {1,5,4,2,3};
+  
+  auto it = std::find_if(values.begin(), values.end(), [](int value){ return value > 3 }); // This is a practical example where lambdas used. To use find_if you need to #include<algorithm>
+  std:: cout << *it << std::endl; // Will return 5 since it is the first number which is greater than 3.
+  
+
+  int a = 5;
+
+  auto lambda = [](int value){ std:: cout << "Value: " << value << std::endl; };
+
+  auto lambda2 = [a](int value){ std:: cout << "a: " << a << std::endl; };
+
+  //ForEach(values, lambda2); if you capture anything then the current function defination for ForEach will give an error. 
+  
+  ForEach2(values, lambda2); // This works
+
+}
+
+In the [] (capture list) you can send variables from outside.
+
+[a, &b] : captures either by copy (a) or by reference (b)
+[this] : captures the current object (*this) by referece
+[&] : captures all automatic varaibles used in the body of the lambda by reference and current object by reference if exists.
+[=] : captures all automatic varaibles used in the body of the lambda by copy and current object by reference if exists.
+[] : captures nothing
+
+
+auto lambda2 = [=](int value){ a = 5; std:: cout << "a: " << a << std::endl; }; 
+
+This would also give an error, to fix this you need to use the word mutable,
+auto lambda2 = [=](int value) mutable { a = 5; std:: cout << "a: " << a << std::endl; }; 
+
+https://en.cppreference.com/w/cpp/language/lambda.html , use this to learn more on how to use it.
+
