@@ -1055,6 +1055,16 @@ MAIN
 
 When creating multi line macros, don't use the space after the backslash, just press enter, which tells the preprocessor that ignore the enter (new line).
 
+#if condition
+// code
+#elif condition
+//code
+#endif
+//code
+
+This is also a macro, the code is part of the program only when its corresponding condition is true.
+
+
 The "auto" keyword in C++ (auto as a datatype):
 
 This is a way to let C++ deduce automatically what the type of the data/varaible is in C++.
@@ -1087,3 +1097,25 @@ typedef LONG_TYPE_NAME SHORT_NAME;
 If your type is like int or string then there is no point in using auto, it makes the code less readable. But for long types it can be very useful.
 
 It is also used for trailing return types.
+
+Static Arrays in C++ (std::array):
+
+It is a part in the C++ STL.
+#include<array>
+
+std::array<datatype, size> variable_name;
+std::array<int, 5> data;
+
+This is almost identical to C styled arrays, which should we use and why?
+
+When using std::array you get access to a .size() method which tells you the size of the array, while in the C styled array you will have to keep a variable to track its size.
+
+int length = data.size();
+
+In memory both std::array and C styled array work in the same way. They are both stored on the stack. While std::vector is stored on the heap.
+In debug mode if you try to access out of bound memory in std::array, it will throw an error while in the C styled array it will overwrite what ever memory was their during the program.
+So basically std::array has bounds checking if you want to. (in debug mode).
+
+You would think the std::array probably needs more memory because it needs to store its size, but no, the size is a template argument. There is not variable that stores the length.
+
+You should std::array instead of C styled arrays because it doesn't affect the performance and it also lets you keep track of size and many other features which C styled arrays don't have.
