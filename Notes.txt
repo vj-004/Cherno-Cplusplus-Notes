@@ -1272,3 +1272,36 @@ auto lambda2 = [=](int value) mutable { a = 5; std:: cout << "a: " << a << std::
 
 https://en.cppreference.com/w/cpp/language/lambda.html , use this to learn more on how to use it.
 
+Why I don't "using namespace std" in C++:
+
+When you don't use "using namespace std", you get to know which all functions are from the C++ standard template library.
+
+namespace apple{
+  void print(const char* text){
+    std::cout << text << std::endl;
+  }
+}
+namespace orange{
+  void print(const std::string& text){
+    std::string temp = text;
+    std::reverse(temp.begin(), temp.end());
+    std::cout << reverse << std::endl;
+  }
+}
+
+using namespace apple;
+using namespace orange;
+
+int main(){
+
+  print("Hello"); 
+  /* this would call the print from namespace orange, because "Hello" is a const* []. 
+  Although the print function in namespace apple can implicitly convert const* [] to a std::string, the print function in namespace orange is a better match.
+  */
+
+}
+
+If we hadn't use namespace apple and orange then there would be no ambiguity.
+
+*Also never ever use namespace in a header file because where that's going to be included and suddenly you are using namespace somewhere you didn't originally intend to.*
+
