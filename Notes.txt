@@ -1368,3 +1368,46 @@ int main(){
 
 Never do using namespaces on top of header files, because if we start using namespace everywhere, we undo the advantage namespace brings us which is remove naming conflicts.
 Try to use using namespace in as small as scope possible.
+
+Threads in C++:
+
+#include<thread>
+
+static bool s_Finished = false;
+
+void DoWork(){
+
+  using namespace std::literals::chrono_literals;
+
+  std::cout << "Started thread with id = " << std::this_thread::get_id() << std::endl;
+
+  while(!s_Finished){
+    std::cout << "Working" << std::endl;
+    
+    // If we let the thread work as fast as possible then we will end up using 100% cpu of that thread which is not ideal.
+
+    std::this_thread::sleep_for(1s)
+
+  }
+
+}
+
+int main(){
+
+  std::thread worker(DoWork); // thid immediatlly kicks of this worker and thread it starts to run the function DoWork.
+
+  std::cin.get();
+  s_Finished = true;
+
+  worker.join(); // main thread waits for worker to finish its work. It says block the current thread until the specified (worker) thread finishes its work.
+  std::cout << "Finished" << std::endl;
+
+  std::cout << "Started thread with id = " << std::this_thread::get_id() << std::endl;
+
+
+  std::cin.get(); // This will not run until the worker thread is finished.
+
+}
+
+They are very useful for speeding up your program.
+
