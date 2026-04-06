@@ -1,3 +1,6 @@
+Best C++ Reference Website: https://cppreference.com/
+
+
 References: Syntaxical sugar, using for creating an alias for a variable.
 
 Class: Syntaxical sugar, used to make the life of programmers easy (helps us write clean code)
@@ -1305,3 +1308,63 @@ If we hadn't use namespace apple and orange then there would be no ambiguity.
 
 *Also never ever use namespace in a header file because where that's going to be included and suddenly you are using namespace somewhere you didn't originally intend to.*
 
+Namespaces in C++:
+
+In libraries the function name "init" is very common, so I have many libraries with the same init function (maybe the function signatures are different and the compiler can differentiate using that but incase even the signature is different), how do I differentiate  between them.
+Here we can use namespaces.
+
+One way is to prepend the library name in front of the function eg. glfw_init(), C doesn't have namespaces so this is a common practice in C based libraries.
+In C++ you can use namespace to solve that issue.
+The primary usecase of namespace is to avoid naming conflicts.
+
+You can write nested namespaces too.
+
+namespace fruit {
+  namespace apple{
+    void print(const char* text){
+      std::cout << text << std::endl;
+    }
+  }
+}
+
+namespace orange{
+  void print(const char* text){
+    std::cout << text << std::endl;
+  }
+  void print_again(const char* text){
+    std::cout << text << std::endl;
+  }
+}
+
+int main(){
+  
+  fruit::apple::print("Hello");
+
+}
+
+
+The same concept applies to static symbols/fucntions/methods in classess. A class is kinda like a namespace, it is namespace of its own.
+
+You use specific function from namespaces.
+
+int main(){
+
+  using namespace orange::print;
+  
+  print("Hello");
+  orange::print("Hello");
+
+}
+
+You can also provide alias to a namespace.
+
+int main(){
+
+  namespace fa = fruit::apple;
+  
+  fa::print("Hello");
+
+}
+
+Never do using namespaces on top of header files, because if we start using namespace everywhere, we undo the advantage namespace brings us which is remove naming conflicts.
+Try to use using namespace in as small as scope possible.
