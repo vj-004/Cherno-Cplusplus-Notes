@@ -1498,3 +1498,40 @@ Creating multiple arrays like in 2D arrays will most definitely lead to segmenta
 
 In the 2D array example we could have just built a 1D array with size 25 (5*5) and tried to do same task, this will be much faster since we don't need to jump from memory to memory everytime we change a row according to the 2D array.
 
+Type Punning in C++:
+
+int main(){
+
+  int a = 50;
+   // double value = a; // a new memory is created which is a double, but what we want the same memory to be treated as a double.
+
+  double value = *(double*)&a; // &a gives us an integer pointer and then we type cast that to a double* and then when we dereference it into a double.
+
+  // double& value = *(double*)&a;  This would not copy the value in a instead this becomes an alias, In this way you don't have to create a new variable.
+
+  std::cout << value << std::endl;
+
+}
+
+What we have done here is pretty bad because int and double are not of the same size. So it might access a memory which we shouldn't be able to "read".
+
+
+struct Entity{
+  int x,y;
+}
+
+int main(){
+
+  Entity e = {5,8};
+
+  //int x = e.x;
+
+  int* position = (int*)&e;
+  std::cout << postion[0] << " " << position[1] << std::endl;
+
+  // This would print: 5 8
+
+  int y = *(int*)((char*)&e + 4)
+  std::cout << y << std::endl;
+
+}
