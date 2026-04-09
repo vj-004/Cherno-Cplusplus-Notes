@@ -1535,3 +1535,64 @@ int main(){
   std::cout << y << std::endl;
 
 }
+
+Unions in C++:
+
+Unions is little bit like a struct type, except it can only occupy the memory of one member at at time.
+If we have struct and have 4 floats in it, then we can have a total of 16 bytes (4*4) in that struct (that's how much space it will occupy).
+A Union can only have 1 member.
+If I create a Unions of 4 floats, the size of the union will still be 4 bytes.
+Say the floats are a,b,c,d. If I change the value of a then the values of b,c,d also changes to the value of a.
+That's how Unions work.
+You can add static/non static functions/methods, but you can't have virtual functions and some other stuff. The reason unions are used is very tightly linked to type punning.
+
+int main(){
+
+  struct Union{
+    union{
+      float a;
+      int b;
+
+      // We have 2 different ways to address the same memory.
+    };
+  }
+
+  Union u;
+  u.a = 2.0f;
+  std::cout << u.a << " , " << u.b << std::endl;
+
+}
+
+struct Vector2{
+  float x,y;
+};
+
+struct Vector4{ // vector4 can be looked at as 2 vector2.
+  
+  union{
+    struct{
+      float x,y,z,w;
+    };
+    struct{
+      Vector2 a,b;
+    };
+  };
+
+};
+
+void PrintVector2(const vector2&vector){
+  std::cout << vector.x << ", " << vector.y << std::endl;
+}
+
+int main(){
+
+  Vector4 vector = {1.0f, 2.0f, 3.0f, 4.0f};
+  PrintVector2(vector.a);
+  PrintVector2(vector.b);
+  vector.z = 500.0f;
+  std::cout << "--------------------------------" << std::endl;
+  PrintVector2(vector.a);
+  PrintVector2(vector.b);
+
+}
+
