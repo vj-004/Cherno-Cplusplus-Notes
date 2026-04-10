@@ -1596,3 +1596,52 @@ int main(){
 
 }
 
+Virtual Destructors in C++:
+
+It is a combination of virtual functions and destructors.
+Very important when you are dealing with polymorphism.
+
+class Base{
+public:
+  Base(){
+    std::cout << "Base Contructor\n" << std::endl;
+  }
+  ~Base(){
+    std::cout << "Base Destructor\n" << std::endl;
+  }
+};
+
+class Derived : public Base {
+public:
+  Derived(){
+    std::cout << "Derived Contructor\n" << std::endl;
+  }
+  ~Derived(){
+    std::cout << "Derived Destructor\n" << std::endl;
+  }
+};
+
+int main(){
+
+  Base* base = new Base();
+  delete base; // base constructor then base destructor
+  std::cout << "----------------------------\n"; 
+  Derived* derived = new Derived();
+  delete derived;  // base constructor , derived constructor , derived destructor then base destructor
+  std::cout << "----------------------------\n"; 
+  Base* poly = new Derived();
+  delete poly; // base constructor , derived constructor then base destructor
+}
+
+We are missing the derived destructor when deleting poly, which can be a major issue.
+So we need to mark the destructor in base class to be virtual.
+
+class Base{
+public:
+  Base(){
+    std::cout << "Base Contructor\n" << std::endl;
+  }
+  virtual ~Base(){
+    std::cout << "Base Destructor\n" << std::endl;
+  }
+};
