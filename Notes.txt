@@ -1645,3 +1645,47 @@ public:
     std::cout << "Base Destructor\n" << std::endl;
   }
 };
+
+Casting in C++:
+
+Type casting in any kind of conversion we want to do within the type system provided to us in C++.
+You need to specifically do type casting until and unless it is a implicit type cast (implicit conversion).
+
+There is C styled cast and there is C++ styled cast.
+
+int a = 5;
+double b = a;
+
+This is implicit conversion
+
+double b = 5.25;
+int a = value; 
+
+This is also an implicit conversion
+If we want to do this explicitly, we can do,
+
+double c = (int)b + 5.3; // This would result in 10.3
+This is a C styled cast.
+
+double s = static_cast<int>(value) + 5.3;
+This is a C++ styled cast. It is static_cast<the value which we want to cast it into> (variable/value).
+
+There are many casts in C++,
+1. static cast
+2. reinterpret cast
+3. dynamic cast
+4. const cast
+
+They do not do anything that C styled cast cannot do, ofcourse they do some additional things but the result of what you get is not different from what you would get in C styled cast.
+These cast are not adding any new functionality, there are only some adding some syntax sugar.
+
+For example dynamic cast, will actually perform a check and it may return null if the type conversion wasn't successfull. It does run time checking.
+It does some extra things which also means it also kinda slows you down.
+
+static_cast also have some checks of its own, like if the type conversion can never take place, it will give you an error when you are writing code.
+reinterpret_cast is like type punning.
+
+With this it adds compile time checking.
+
+Dynamic cast is tied very closely to Run Time Type Information (RTTI).
+
