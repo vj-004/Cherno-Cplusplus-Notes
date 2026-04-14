@@ -612,6 +612,9 @@ Shared pointer definitely has some overhead because of its reference counting sy
 
 You should prefer using unique_ptr first than shared_ptr. If you can complete you task using unique_ptr then don't use shared_ptr.
 
+Also shared_ptr is not thread safe and there are bunch of other constraints which come with smart pointer.
+So you need to use them carefully in code.
+
 
 Copying and Copy Contructors in C++ :
 
@@ -1689,3 +1692,22 @@ With this it adds compile time checking.
 
 Dynamic cast is tied very closely to Run Time Type Information (RTTI).
 
+
+Precomiled Headers in C++:
+
+They give you an opportunity to grab a bunch of header files and covert them into a compiled format which the compiler can then use instead of compiling the header files again and again.
+With out precompiled headers everytime you make the smallest change to your C++ program all the header files need to compiled again and this wastes a lot of time in compiling.
+If you have mulitiple C++ file in your project and they all include vector then you will have to compile the vecter.h header file those many number of times. This is wasted time during compiling.
+
+Why to not use precompiled headers? 
+The precompiled headers is essentially a header file which contains a bunch of header files. And because of that a lot of people might be like I can put every thing in my project into my PCH(pre compiled header).
+    If I do that I will get really fast build times right?
+      Yes but, if you put stuff in your PCH which actually changes, then obviously your precompiled header has to be rebuilt and that takes time and it could potentially increase your compilation time from before.
+      So don't put frequently changing files in the PCH.
+
+    It is mostly used for code/libraries that isn't yours. Because you won't be modifing these libraries. Put all of this in your precompiled header.
+    
+    There is one more thing PCH can do, because you shove everything in your PCH, it can potentially hide what is actually being used.
+    For example you have used PCH and you are writing a CPP file. Now you/other wants to take this file and use it somewhere else but now you don't know which all header files this CPP file actually uses.
+
+Different IDEs' and different compilation methods have differnt ways on implementing precompiled headers.
