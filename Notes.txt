@@ -835,7 +835,7 @@ Static linking means that the library gets put into your executable. It is insid
 Static linking is technically faster, as linking optimizations and other optimizations can be applied.
 
 To link a library you need to main things which is the include folder which holds all the header files and the library file, which holds all the definations to those headers.
-So create a folder called dependencies and inside this create a separate folder for each library, in each library folder add the include and the lib folder for that particualr library.
+So create a folder called dependencies and inside this create a separate folder for each library, in each library folder add the include and the lib folder for that particular library.
 
 In the lib folder of your library. You will have,
 library_name.dll : extension is the runtime dynamic link library. 
@@ -1711,3 +1711,44 @@ The precompiled headers is essentially a header file which contains a bunch of h
     For example you have used PCH and you are writing a CPP file. Now you/other wants to take this file and use it somewhere else but now you don't know which all header files this CPP file actually uses.
 
 Different IDEs' and different compilation methods have differnt ways on implementing precompiled headers.
+
+Dynamic Casting in C++:
+
+Dynamic casting gives us kind of a safety net when we do a particular type of casting.
+It is a C++ styled cast which only works in C++, and it does some extra work to make sure that the way that we actually cast is actually a valid cast.
+
+Dynamic Cast only works with polymorphic class types, that means that we need to have virtual function table in the Entity class.
+
+class Entity{
+  virtual void Anything() {}
+};
+
+class Player : public Entity{
+
+};
+
+class Enemy : public Entity{
+
+};
+
+int main(){
+
+  Player* player = new Player(); // player is of type Player, Entity and it also of a type "typeless". 
+  Entity* actuallyPlayer = player;
+
+  // Player* p = actuallyPlayer;  This will give an error because e could have very easily also been a Enemy. So we need to type case.
+  Player* p = (Player*)actuallyPlayer;
+
+  Entity* actuallyEnemy = new Enemy();
+  Player* p1 = (*actuallyEnemy)e1; // This would work but this is potentially dangerous because if we try to access something which is only defined for the Player class, using *p1 would crash our program or make it do some really weired things which we don't wanna do.
+
+  Player* p2 = dynamic_cast<Player*>(actuallyEnemy); // This should fail. p3 will be null.
+  Player* p3 = dynamic_cast<Player*>(actuallyPlayer);
+
+}
+
+How does it know that the entity which I have is actually a player and not an enemy? 
+The way that it does that it is it acutally stores the run time type information (RTTI) about all of our types, 
+This adds overhead but it lets you do things like dynamic casting.
+The dynamic cast itself also takes extra overhead because it needs to run some checks.
+Dynamic casts require RTTI to be ON whenever they are to be used.
