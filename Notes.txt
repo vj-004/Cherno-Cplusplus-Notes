@@ -1752,3 +1752,91 @@ The way that it does that it is it acutally stores the run time type information
 This adds overhead but it lets you do things like dynamic casting.
 The dynamic cast itself also takes extra overhead because it needs to run some checks.
 Dynamic casts require RTTI to be ON whenever they are to be used.
+
+Benchmarking in C++:
+
+class Timer{
+
+public:
+  Timer(){
+
+    m_StartTimePoint = std::chrono::high_resolution_clock::now();
+
+  }
+
+  ~Timer(){
+    Stop();
+  }
+
+
+  void Stop(){
+    auto endTimePoint = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimePoint).time_since_epoch().count();
+    auto end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimePoint).time_since_epoch().count();
+    
+    auto duration = end - start;
+    double ms = duration * 0.001;
+
+    std::cout << duration << "us (" << ms << "ms)\n";
+  }
+
+private:
+  std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTime;
+};
+
+//When the Timer object gets created we start the timer and when the object gets destroyed we stop the timer. This is basically RAII (Resource Accusation Is Initialization)
+
+int main(){
+
+  int value = 0;
+  {
+    Timer timer;
+    for(int i=0;i<1000000;i++){
+      value+=2;
+      std::cout << value << std::endl;
+    }
+  }
+
+  std::cout << value << std::endl;
+
+}
+
+The C++ compiler optimizes your code during run time in production, so when you are timing make sure that either you are in debug mode so the compiler does not do any optimizations or just know that the timer object will time the optimized code which the compiler runs.
+But timing in DEBUG MODE is not very helpful because there are a lot of safety things which add unneseccary overhead.
+
+int main(){
+
+  struct Vector2{
+    float x,y;
+  };
+
+  std::cout << "Make Shared\n";
+  {
+    std::array<std::shared_ptr<Vector2>, 1000> sharedPtrs;
+    Timer timer;
+    for(int i=0;i<sharedPtrs.size();i++){
+      sharedPtrs[i] = std::make_shared<Vector2>();
+    }
+  }
+  std::cout << "New Shared\n";
+  {
+    std::array<std::shared_ptr<Vector2>, 1000> sharedPtrs;
+    Timer timer;
+    for(int i=0;i<sharedPtrs.size();i++){
+      sharedPtrs[i] = std::shared_ptr<Vector2>(new Vector2());
+    }
+  }
+
+  std::cout << "Make Unique\n";
+  {
+    std::array<std::unique_ptr<Vector2>, 1000> sharedPtrs;
+    Timer timer;
+    for(int i=0;i<sharedPtrs.size();i++){
+      sharedPtrs[i] = std::make_unique<Vector2>();
+    }
+  }
+
+}
+
+Make Unique (fastest) < Make Shared < New Shared (slowest) 
+This is the results in PRODUCTION MODE
