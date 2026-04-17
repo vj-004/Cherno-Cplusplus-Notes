@@ -1840,3 +1840,35 @@ int main(){
 
 Make Unique (fastest) < Make Shared < New Shared (slowest) 
 This is the results in PRODUCTION MODE
+
+STRUCTURED BINDINGS in C++ (specific to C++ 17 and after):
+
+It makes it easier when a function is returing multiple return types.
+Lets say if we are using tuples to return multiple datatypes,
+
+std::tuple<std::string, int> CreatePerson(){
+  return {"Vayun", 22};
+}
+
+int main(){
+
+  // normal way
+  auto person = createPerson();
+  std::string& name = std::get<0>(person);
+  int age = std::get<1>(person);
+
+  // there is another with tie() function
+  std::string name2;
+  int age2;
+  std::tie(name2, age2) = CreatePerson();
+
+
+  // STRUCTURED BINDINGS WAY
+  auto[name3, age3] = CreatePerson();
+
+}
+
+
+Keep in mind that there is not space between "auto" and "[" while defining and declaring the variables using STRUCTURED BINDINGS.
+
+
