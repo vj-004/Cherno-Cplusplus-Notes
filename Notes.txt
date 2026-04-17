@@ -1871,4 +1871,48 @@ int main(){
 
 Keep in mind that there is not space between "auto" and "[" while defining and declaring the variables using STRUCTURED BINDINGS.
 
+How to deal with OPTIONAL Data in C++ (in and after C++ 17):
 
+We are going to talk about std::optional<data_type> . 
+
+#include <optional>
+#include <fstream>
+
+std::optional<string> ReadFileAsString(const std::string& filepath){
+
+  std::ifstream stream(filepath);
+  if(stream){
+
+    std::string result;
+    //read file
+    stream.close();
+    return result;
+  }
+
+  return {};
+
+}
+
+int main(){
+
+  std::optional<std::string> data = ReadFileAsString("data.txt");
+  
+  std::string value = data.value_or("Not present"); // If data is not present, then the value of data would be "Not present"
+
+  if(data.has_value()){
+    // optional value has been set
+    std::cout << "File read successfully\n";
+    std::cout << data.value() << '\n';
+  }
+
+  // This also works
+
+  if(data){
+    // optional value has been set
+    std::cout << "File read successfully\n";
+  }
+  else{
+    std::cout << "File could not be open\n";
+  }
+
+}
