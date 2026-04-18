@@ -1,7 +1,7 @@
 Best C++ Reference Website: https://cppreference.com/
 
 
-References: Syntaxical sugar, using for creating an alias for a variable.
+References: Syntaxical sugar, used for creating an alias for a variable.
 
 Class: Syntaxical sugar, used to make the life of programmers easy (helps us write clean code)
 
@@ -9,7 +9,7 @@ Methods in a class/struct: non-static methods in a class get a instance of the c
 
 Constructors: If you don't want anybody to be able to instanciate a class, you can create an empty constructor as a private method or you can write "class_name() = delete;" under public and you can't instanciate your class anymore.
 
-Inheritance: If a class B inherits from another class A, then class B also "is of type A". This means that class B can also used as class A while passing in functions because class B is garenteed to have all the (public) functionality that A has.
+Inheritance: If a class B inherits from another class A, then class B also "is of type A". This means that class B can also used as class A while passing it in functions because class B is garenteed to have all the (public) functionality that A has.
 
 A function is made virtual in a class if a derived class may override it.
 Virtual Functions: they introduce something called dynamic dispatch which compilers implement using something called a V-table. It is a table which maps all the virtual function inside our base class so that we can map them to the correct overwritten function in run time.
@@ -66,7 +66,7 @@ the std library in C++ actually has a library called basic string which is templ
 String literals:
 "Vayun"; is a string literal, its is a const char* with a length of 6, because there is a null character in the end
 
-char name* = "Vayun";
+char* name = "Vayun";
 name[2] = 'z';
 This is undefined behaviour, private compilers will give error on this code but MSVC will compile it just fine.
 
@@ -107,7 +107,7 @@ const char* para1 = "Line1\n"
 CONST in C++:
 
 It is a like a promise, it is a promise that something will be constant. But like in real life, there are ways to break this promise
-It also help us enforce certain rules of the developer who will working with the code
+It also help us enforce certain rules for the developer who will be working with the code
 
 int* a = new int;
 Here you can change the contents of a and also you can change the address, the variable a is pointing to
@@ -131,7 +131,7 @@ given this code snippet:
 class Entity{
  private:
   int m_x, m_y;
-  mutable int var; // why we mark it mutable is written later on (line 157)
+  mutable int var; // why we mark it mutable is written later on (line 161)
  
  public:
   int GetX() const {  //  making this fucntion const means that this function will not change anything in the class (it won't change the class)
@@ -207,7 +207,7 @@ The initialization should be in the order in which they are declared. (The membe
 
 What difference does it make?
 1) One of the difference is that it helps keeps your code clean, you can write all you initializations outside the function in a line, this way you can clearly see what the function is actually doing.
-2) There is also a difference functionally and this difference applies to classes specifically,  
+2) There is also a difference in functionally and this difference applies to classes specifically,  
 
 class Example{
   public:
@@ -1916,3 +1916,62 @@ int main(){
   }
 
 }
+
+Multiple TYPES of Data in a SINGLE VARIABLE in C++? (C++17 and after):
+
+#include <variant>
+
+int main(){
+
+  std::variant<std::string, int> data;
+
+  std::cout << sizeof data << '\n'; // If we were to use a union, the size of the type would the size of the largest type. But variants don't work like that, so sizeof data is sum of its datatypes.
+
+  // technically speaking Unions are more better and more efficient than variants however variants are much more type safe, we don't have undefined behaviour with variants.
+  // you should use variants unless you are really trying to do low level optimization.
+
+  data = "Cherno";
+  std::cout << std::get<std::string>(data) << '\n'; // Cherno
+  data = 2;
+
+  auto* value = std::get_if<std::string>(&data); // This returns us a pointer. It return nullptr if it not that type else it will give us a pointer to the variable.
+
+  std::cout << std::get<std::string>(data) << '\n'; // 2
+
+  // data = false; This won't throw an error but we won't be able to use it later.
+
+  int datatype = data.index() // variant maps each data type to an index. (0 based). This will output 1 because data is "int" which is mapped to 1
+
+}
+
+How to store ANY data in C++ (C++ 17 and after):
+
+#include <any>
+
+int main(){
+
+  // std::any data = std::make_any<>;
+  std::any data;
+  data = 2;
+  data = std::string("Cherno");
+  data = std::string("Cherno");
+
+  string value = std::any_cast<std::string>(data); // to get the data you need to know which type it is and then cast it to that type using the any_cast.
+  // This will throw a bad any type exception if the data you are trying to cast is not valid.
+
+}
+
+Variant is basically a type safe union. It basically stores its data in an Union.
+In ANY, for small types it just stores them as a union (which is exactly like a variant), but for large types it uses void* (big storage) and it will dynamically allocate memory.
+And Dynamically allocated memory is not good for performance.
+
+To improve performance we can avoid a copy which we are doing in string value = std::any_cast<std::string>(data);
+We can instead write,
+  string& value = std::any_cast<std::string&>(data);
+In this you will get it as a referece.
+
+std::any will allocate if it needs to, if the data is above is size limit (large data type) it will call new and trigger a dynamic memomry allocation.
+
+When should we use?
+It is kinda useless, use variant in any case because it basically a type safe std::any and it also doesn't allocate dynamically so it is better for performance.
+It is something to be aware but is not somethings that you should use all that often.
