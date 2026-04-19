@@ -1975,3 +1975,47 @@ std::any will allocate if it needs to, if the data is above is size limit (large
 When should we use?
 It is kinda useless, use variant in any case because it basically a type safe std::any and it also doesn't allocate dynamically so it is better for performance.
 It is something to be aware but is not somethings that you should use all that often.
+
+How to make C++ run FASTER (with std::async):
+
+You should remember you can't mindlessly break your program into multiple thread. You need to check which part of the program can actually be processed separately and break the program accordingly.
+
+#include <future>
+
+void LongTask(){
+  //code
+}
+
+void DoTask(std::vector<std::future<void>>& m_Futures){
+  // lets say I want to run the LongTask function say 20 times. All the function calls are independent of each other so I can call them in separate threads.
+  // so to do that,
+
+  for(int i=0;i<20;i++){
+    /* 
+      we need to set what kind of job this will be, it is important to set the launch type to be async. 
+      if instead we set it to defered or defered+async then it may not be actually done on a separate thread. 
+      C++ will choose that on the current work load.
+
+      std::async(std::launch::async, LongTask); 
+      
+      std::async actually returns an std::future and it is really important that we hang on to that std::future.
+      Because if we don't hang on to that std::futures, it will be destroyed and upon destruction it needs to ensure that the async function needs
+      to be finished that would basically mean that it won't be parallel at all.
+
+      Upon completing one iteration of this for loop, 
+        the LongTask function will actually in the destructor of std::future wait for the LongTask method to be finished.
+        So basically we need to store this as a member varaible. 
+    */
+
+    m_Futures.push_back(std::async(std::launch::async, LongTask));
+    
+  }
+}
+
+int main(){
+
+  
+  std::vector<std::future<void>> m_Futures; // here void is basically the return type of the function which will be "stored" in std::future.
+  DoTask(m_Futures);
+
+}
