@@ -2019,3 +2019,58 @@ int main(){
   DoTask(m_Futures);
 
 }
+
+How to make your STRINGS FASTER in C++! :
+
+What is one of the main issue with std::string, string formatting, string operations in general is that they allocate memory.
+
+void PrinName(const std::string& name){
+  std::cout << name << std::endl;
+}
+
+int main(){
+
+  std::string name = "Vayun Jain";
+  PrintName(name); // This would result in 1 allocation
+  
+  std::string firstName = name.substr(0,5);
+  std::string lastName = name.substr(6,5);
+
+  PrintName(firstName); // This would result in 3 allocation
+
+  //Just with a few operations we are at 3 allocations and in large programs this can pile up very fast.
+
+}
+
+Let us try to optimize this
+
+void PrinName(std::string_view name){
+  std::cout << name << std::endl;
+}
+
+int main(){
+
+  std::string name = "Vayun Jain";
+  
+  std::string_view firstName(name.c_str(), 5); // string_view takes in a pointer to the start of the string you want to view and it also takes the size of that string. c_str() converts name into a C string pointer.
+  std::string_view lastName(name.c_str()+5, 5); 
+
+  PrintName(firstName); // This would result in 1 allocation coming from the first initialization of name.
+  PrintName(lastName); // This would result in 1 allocation coming from the first initialization of name.
+
+
+}
+
+int main(){
+
+  const char* name = "Vayun Jain";
+  
+  std::string_view firstName(name, 5); 
+  std::string_view lastName(name+5, 5); 
+
+  PrintName(firstName); // This would result in 0 allocation coming from the first initialization of name.
+  PrintName(lastName); // This would result in 0 allocation coming from the first initialization of name.
+
+  PrintName("Vayun"); // This would also give 0 allocation because it considers it as a string_view.
+
+}
