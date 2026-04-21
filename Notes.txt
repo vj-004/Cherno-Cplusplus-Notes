@@ -2074,3 +2074,195 @@ int main(){
   PrintName("Vayun"); // This would also give 0 allocation because it considers it as a string_view.
 
 }
+
+SINGLETONS in C++:
+
+It is basically is a design pattern where you have a class and that class/struct is going to have only one instance.
+But the whole point of classes and objects in OOPS was that you can create multiple of them, so why will we only create 1 instance?
+If we are using a SINGLETON, its quite easy to look at it and say this does not need a class, cuz if you are going to have a single instance of an object,
+what you really have is just one singular set of data and some methods to go along with it. If we don't want the advantages of a class, why should we create a class.
+
+In java OOPS is strictly enforced, everything is a class, you can't write code outside a class, so if we want "static" functionality you just have to make static members in your class and a static group of functions.
+We in C++ are not really bound by those rules, as we can have completely global/static vairables and methods. 
+But the SINGLETON design pattern, where does that come to play?
+
+SINGLETONS in C++ are just a way to organize a bunch of global variables and static functions that may or may not act on those variables into one kind of organized blob which is essentially under a single namespace.
+
+ITS IS A NAMESPACE (with some other features if needed)
+
+class Singleton{
+
+public: 
+
+  Singleton(const Singleton&) = delete;
+
+  static Singleton& Get(){
+    return s_Instance;
+  }
+  void Function() {}
+
+private:
+  Singleton() {}
+
+  static Singleton s_Instance;
+
+}
+
+Singleton Singleton:: s_Instance;
+
+int main(){
+  
+  Singleton::Get().Function();
+
+  //Semantiacally this has some flaws because I can do something like this,
+  
+  Singleton instance = Singleton::Get(); /* what I actually wanted to do was Singleton& instance = Singleton::Get(); 
+    This doesn't create a copy of the singleton class but if someone didn't create a reference, then we have just created a copy.
+  */
+  // I have just create a COPY of the Singleton class and this is not the SINGLETON pattern.
+
+  // One way to handle this is to delete the COPY Constructor of the Singleton class
+  instance.Function();
+
+
+
+}
+
+
+Lets take an example:
+
+class Random{
+
+public: 
+
+  Random(const Random&) = delete;
+
+  static Random& Get(){
+    return s_Instance;
+  }
+
+  float Float() {
+
+    return m_RandomGenerator; // assume that this works
+  }
+
+private:
+  Random() {}
+
+  float m_RandomGenerator = 0.0f;
+
+  static Random s_Instance;
+
+}
+
+Random Random:: s_Instance;
+
+int main(){
+
+  float number = Random::Get().Float();
+
+  auto& random = Random::Get();
+  float number2 = random.Float();
+
+}
+
+Another way of creating a SINGLETON class, so that we can directly do float number = Random::Float(); is like this,
+
+class Random{
+
+public: 
+
+  Random(const Random&) = delete;
+
+  static Random& Get(){
+    return s_Instance;
+  }
+
+  static float Float(){
+    return Get().IFloat();
+  }
+
+private:
+  float IFloat() { // I here stands for internal implementation or just implementation, some people also write it as FloatImpl,
+
+    return m_RandomGenerator; // assume that this works
+  }
+  Random() {}
+
+  float m_RandomGenerator = 0.0f;
+
+  static Random s_Instance;
+
+}
+
+Random Random:: s_Instance;
+
+int main(){
+
+  float number = Random::Float();
+
+}
+
+We can make it slightly better by trying to remove the Get() function because we are having to create static instance 
+in the class members (static Random s_Instance;) and also we need to define it in some kind of translation unit (Random Random:: s_Instance;)
+
+So we can do,
+
+class Random{
+
+public: 
+
+  Random(const Random&) = delete;
+
+  static Random& Get(){
+    static Random instance;
+    return instance;
+  }
+
+  static float Float(){
+    return Get().IFloat();
+  }
+
+private:
+  float IFloat() { // I here stands for internal implementation or just implementation, some people also write it as FloatImpl,
+
+    return m_RandomGenerator; // assume that this works
+  }
+  Random() {}
+
+  float m_RandomGenerator = 0.0f;
+
+}
+
+
+int main(){
+
+  float number = Random::Float();
+
+}
+
+So when does a class become a SINGLETON, its when it has a Get() function which is defined like this,
+static Random& Get(){
+  static Random instance;
+  return instance;
+}
+
+The question still remains why can't I just create a namespace instead of doing all this hardwork?
+
+namespace RandomClass{
+  
+  static float s_RandomGenerator = 0.5f;
+  static float Float(){
+    return s_RandomGenerator;
+  }
+
+}
+
+int main(){
+
+  float number = RandomClass::Float;
+
+}
+
+There is no functional difference between a SINGLETON and a NAMESPACE. Only thing is that you lose some PUBLIC, PRIVATE functinality but there are ways around it.
+Creating a class just helps you keep it more organized.
