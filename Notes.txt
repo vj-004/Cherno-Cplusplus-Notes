@@ -2266,3 +2266,27 @@ int main(){
 
 There is no functional difference between a SINGLETON and a NAMESPACE. Only thing is that you lose some PUBLIC, PRIVATE functinality but there are ways around it.
 Creating a class just helps you keep it more organized.
+
+
+Small String Optimization in C++:
+
+Strings are slow, but it's not all bad.
+How are small strings optimized by the C++ STL so they don't end up as bad as you think.
+There are slow because of memory allocation.
+So STL says that why are we allocating small strings in heaps?
+ I can just allocate a small stack based buffer that is not heap allocated and that is going to be my static string storage for strings that are below a certain length.
+The threshold lenght which we are talking about can vary according to the C++ STL that we are using.
+
+void* operator new(size_t size){
+  
+  std::cout << " Allocating: " << size << "bytes\n;
+  return malloc(size);
+
+}
+
+int main(){
+
+  std::string name = "Cherno"; // you might think this might come with a heap allocation overhead. But this comes inside the category of small strings that means it will in fact just be stored in a statically allocated buffer that does not touch the heap at all.
+  // We don't allocate anything. There is nothing printed out in console.
+
+}
