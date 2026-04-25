@@ -2290,3 +2290,67 @@ int main(){
   // We don't allocate anything. There is nothing printed out in console.
 
 }
+
+Track MEMORY ALLOCATIONS the Easy Way in C++:
+
+void* operator nwe(size_t size){
+  std::cout << "Allocating " << size << " bytes" << '\n';
+  return malloc(size);
+}
+
+struct Object{
+  int x,y,z;
+}
+
+int main(){
+
+  Object* obj = new Object;
+
+}
+
+You can stick a break point in the operator new function and trace back where the allocation are happening.
+Even things like unique_ptr use the NEW keyword underneath so they will also use the overloaded new function.
+
+You can also overload the delete operator.
+
+void operator delete(void* memory, size_t size){ // the delete operator doesn't take a size by default but you can take it just like this.
+  std::cout << "Freeing " << size << " bytes" << '\n';
+  free(memory);
+}
+
+
+struct AllocationMetrics{
+
+  uint32_t TotalAllocated = 0;
+  uint32_t TotalFreed = 0;
+
+  uint32_t CurrentUsage(){
+    return TotalAllocated - TotalFreed;
+  }
+
+};
+
+static AllocationMetrics s_AllocationMetrics;
+
+void* operator nwe(size_t size){
+  // std::cout << "Allocating " << size << " bytes" << '\n';
+  
+  TotalAllocated += size;
+  return malloc(size);
+}
+
+void operator delete(void* memory, size_t size){ // the delete operator doesn't take a size by default but you can take it just like this.
+  //std::cout << "Freeing " << size << " bytes" << '\n';
+  
+  TotalFreed += size;
+  free(memory);
+}
+
+static void PrintMemoryUsage(){
+  std::cout << "Memory Usage: " << s_AllocationMetrics.CurrentUsage() << "bytes\n";
+}
+
+
+
+
+
