@@ -151,7 +151,7 @@ Here both m_x and m_y are pointers
 
 Given that entity class, if I create a function like
 
-void PrintEntity(const Entity& e){   // using a const referece here means that we won't be copying the entity class. and since it is a "const" we can't change the entity (ie. we can't change its contents)
+void PrintEntity(const Entity& e){   // using a const reference here means that we won't be copying the entity class. and since it is a "const" we can't change the entity (ie. we can't change its contents)
     cout << e.GetX() << '\n';
 }
 
@@ -1265,7 +1265,7 @@ int main(){
 In the [] (capture list) you can send variables from outside.
 
 [a, &b] : captures either by copy (a) or by reference (b)
-[this] : captures the current object (*this) by referece
+[this] : captures the current object (*this) by reference
 [&] : captures all automatic varaibles used in the body of the lambda by reference and current object by reference if exists.
 [=] : captures all automatic varaibles used in the body of the lambda by copy and current object by reference if exists.
 [] : captures nothing
@@ -1968,7 +1968,7 @@ And Dynamically allocated memory is not good for performance.
 To improve performance we can avoid a copy which we are doing in string value = std::any_cast<std::string>(data);
 We can instead write,
   string& value = std::any_cast<std::string&>(data);
-In this you will get it as a referece.
+In this you will get it as a reference.
 
 std::any will allocate if it needs to, if the data is above is size limit (large data type) it will call new and trigger a dynamic memomry allocation.
 
@@ -2332,7 +2332,7 @@ struct AllocationMetrics{
 
 static AllocationMetrics s_AllocationMetrics;
 
-void* operator nwe(size_t size){
+void* operator new(size_t size){
   // std::cout << "Allocating " << size << " bytes" << '\n';
   
   TotalAllocated += size;
@@ -2351,6 +2351,114 @@ static void PrintMemoryUsage(){
 }
 
 
+lvalues and rvalues in C++:
+
+int GetValue(){
+  return 10;
+}
+
+int& GetValue_lvalue(){ // int& is called an lvalue reference.
+
+  static int value = 10;
+  return value;
+
+}
+
+void SetValue(int value){
+
+}
+
+void SetValue_rvalue(int& value){
+
+}
+
+void SetValue_rvalue_const_reference(const int& value){
+
+}
+
+int main(){
+
+  int i = 10; // we have 2 parts to this expression, a left side and a right side. And this is also another good way to think about what lvalue and rvalue are.
+  
+  // we have a variable called i which is an actual variable with a location while 10 is just a numeric literal, it has not storage and location until it is assigned to a lvalue(i).
+  // you can't something to an rvalue, you can't say 10 = i;
+
+  int a = i; // here you are assinging a lvalue to another lvalue.
+
+  int j = GetValue(); // Here GetValue() returns an rvalue, returns a temporary value, even though it returns an int, it doesn't not have a location.
+  // GetValue() = 5; This does not work.
+
+  GetValue_lvalue() = 5; // GetValue_lvalue returns an lvalue reference.
+
+  SetValue(i); // SetValue is called with a lvalue
+  SetValue(10); // SetValue is called with a rvalue, this rvalue will be used to create a lvalue when the function is actually called.
+
+  // SetValue_rvalue(10); This will throw an error, you can't create an lvalue reference from 
+
+  // int& b = 10; This will give you an error
+  const int& b = 10; // This will work 
+
+  SetValue_rvalue_const_reference(10); // This now works because I am assigning an rvalue to a const lvalue reference.
+  SetValue_rvalue_const_reference(i);
+
+}
+
+An lvalue is a lot of the times something which is on the left side of the equal sign
+An rvalue is a lot of the times something which is on the right side of the equal sign
+This does not always apply
+
+GetValue_lvalue returns an lvalue
+
+There is another rule, you cannot take an lvalue reference from an rvalue.
+You can only have an lvalue reference of an lvalue
+
+There is a special rule, while I can't have an lvalue reference of an rvalue, if is a const lvalue reference I can. It is kind of like a work around, the compiler handles the implementation.
+
+void PrintName_lvalue(std::string& name){
+  std::cout << name << std::endl;
+}
+
+void PrintName_Common(const std::string& name){
+  std::cout << name << std::endl;
+}
+
+void PrintName_rvalue(std::string&& name){ // std::string&& is an rvalue reference.
+  std::cout << name << std::endl;
+}
+
+int main(){
+
+  std::string firstName = "Vayun";
+  std::string lastName = "Jain";
+
+  std::string fullName = firstName + lastName;
+
+  // firstName, lastName and fullName are lvalue, while "Vayun", "Jain", firstName+lastName are rvalues.
+  // Yes firstName + lastName is an rvalue. It is a temporary object.
+
+  PrintName_lvalue(fullName);
+  // PrintName_lvalue(firstName + lastName) this fails
+
+  PrintName_Common(fullName);
+  PrintName_Common(firstName + lastName); // const reference allows us to send a rvalue.
+
+  // PrintName_rvalue(fullName); this fails
+  PrintName_rvalue(firstName + lastName) 
 
 
+}
 
+The reason why a lot of C++ function take in const references input parameter types because then they are compatible with both rvalues and lvalues.
+
+So we can write functions which only use lvalues by not using const reference.
+We can write functions which can use both lvalues and rvalues 
+
+So PrintName_rvalue lets you write a function which only accepts rvalues. It is done using something called an rvalue reference (std::sring&&)
+
+This helps because now we can write overloaded functions which can handle both rvalues and lvalues differently if needed.
+If both  PrintName_Common and PrintName_rvalue functions exists the PrintName_rvalue function will be choosen if we choose to send an rvalue as a parameter.
+With rvalues reference we can now detect temporary values and do something with them.
+
+This especially useful with move semantics.
+Another main advantage here is to do with optimization, if we know we are taking a temporary object, then we don't need to worry about keeping it alive/ making sure we keep it intact / making sure we copy it,
+we can simply steal the resource which might be attached to that specific object and use them somewhere else because we know its temporary, it is not going to exist for very long.
