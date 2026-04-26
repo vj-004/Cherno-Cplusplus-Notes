@@ -2462,3 +2462,25 @@ With rvalues reference we can now detect temporary values and do something with 
 This especially useful with move semantics.
 Another main advantage here is to do with optimization, if we know we are taking a temporary object, then we don't need to worry about keeping it alive/ making sure we keep it intact / making sure we copy it,
 we can simply steal the resource which might be attached to that specific object and use them somewhere else because we know its temporary, it is not going to exist for very long.
+
+
+
+Argument Evaluation Order in C++:
+
+void PrintSum(int a, int b){
+  std::cout << a << " + " << b << " = " << (a+b) << std::endl;
+}
+
+int main(){
+  int value = 0;
+
+  // PrintSum(value++, value++); This is undefined behaviour, this is unreliable and it will be different for different compilers.
+
+  // But after C++ 17, the postfix-expression is sequenced before each expresion in the expression-list and any default argument.
+  // The initialization of a paramter, including evry associated value computation and side effect, is indertminately sequenced with respect to that of any other paramter.
+
+  PrintSum(value++, value++); // would definitely result is the sum being 1 ((1 + 0) or (0 + 1)) but we can't say will it evaluate a first or b first.   
+
+}
+
+Essentially it is undefined behaviour. 
