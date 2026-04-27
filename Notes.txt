@@ -2484,3 +2484,126 @@ int main(){
 }
 
 Essentially it is undefined behaviour. 
+
+Move Semantics in C++:
+
+Essentially just allow us to move objects around and it was not available before C++ 11.
+The basic idea is that when we are writing C++ code we don't want to or need to necessarily copy objects from one place to another but that's really the only place we can get it from one place to another.
+For example, if I am passing on object into a function which is then going to take ownership of that object, we have no choice but to copy it. 
+If I want to pass a new object that I am creating into some kind of function that takes ownership of it or whatever, we unfortunately need to construct essentially a throw away object in the current stack frame and then copy it into the function.
+
+So if we can just MOVE the object instead of COPYING it, our performance will get better.
+
+class String{
+
+public:
+  String() = default;
+  String(const char* string){
+    printf("Created\n");
+    m_Size = strlen(string);
+    m_Data = new char[m_Size];
+    memcpy(m_Data, string, m_Size);
+  }
+
+  String(const String& other){
+    printf("Copied\n");
+    m_Size = other.m_Size;
+    m_Data = new char[m_Size];
+    memcpy(m_Data, other.m_Data, m_Size);
+  }
+
+  ~String(){
+    printf("Deleted\n");
+    delete m_Data;
+  }
+
+  void Print(){
+    for(uint32_t i = 0; i < m_Size; i++){
+      printf("%c", m_Data[i]);
+    }
+    printf("\n");
+  }
+
+private:
+  char* m_Data;
+  uint32_t m_Size;
+
+};
+
+class Entity{
+
+public:
+  Entity(const String& name) : m_Name(name){
+
+  }
+
+  //Entity(String&& name) : m_Name((String&&)name){  when we do m_Name(name) it is still using the COPY constructor, so we need to type cast it to a String&&
+
+  //}
+
+  // In practice you would not cast it into a RVALUE reference instead we would use std::move.
+  Entity(String&& name) : m_Name(std::move(name)){
+
+  }
+
+  void PrintName{
+
+  }
+
+
+private:
+  String m_Name;  
+
+};
+
+
+int main(){
+
+  Entity entity("Vayun");
+  entity.PrinName();  
+
+}
+
+This is no way a good implementation of the String class but we can learn how to use MOVE SEMANTICS through this.
+The output of this program would be:
+
+Created!
+Copied!
+Vayun
+Deleted!
+
+What we want to do is avoid that "Copied!" line since that needs a heap alloaction which is not good.
+To do that we need to write something called a MOVE CONSTRUCTOR 
+It is simillar to a COPY CONSTRUCTOR but it takes in an RVALUE reference.
+We would also have to make sure that the Entity class has a constructor which can take a temporary, otherwise we will be passing an lvaue instead of an rvalue in the MOVE SEMANTICS constructor.
+
+String(String&& other) noexcept { // takes in a rvalue reference. we mark it noexcept because it is not really supposed to be throwing exceptions
+
+  printf("Moved\n");
+  m_Size = other.m_Size;
+  m_Data = other.m_Data; // instead of actually a new buffer of data and copying everything into it, we will point to the same block of data which we have created before.
+
+  /*
+
+  This created a problem as we still have 2 string instances, so what happens to the old one when it gets deleted?
+  So according to the destructor its going to take the data with it (the string data will get deleted)
+
+  So we have to also take care of the other String which you are taking control of, essentaially you are stealing its data.
+  To do that we assign other.m_Data to a nullptr and the m_Size to be "0"
+
+  By doing this you are basically creating something called an hollow object. 
+  Effectively we have takes over the old string.
+
+  */
+
+  other.m_Size = 0;
+  other.m_Data = nullptr;
+ 
+}
+
+The output after adding this MOVE CONSTRUCTOR into the String class (as a public method) and also creating a CONSTRUCTOR in the Entity Class (for the RVALUE reference) we get,
+Created!
+Moved!
+Deleted!
+Vayun
+
