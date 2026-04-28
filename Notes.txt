@@ -2512,9 +2512,42 @@ public:
     memcpy(m_Data, other.m_Data, m_Size);
   }
 
+  /*
+
+    Move Constructor
+    String(String&& other) noexcept { 
+
+      printf("Moved\n");
+      m_Size = other.m_Size;
+      m_Data = other.m_Data; 
+
+      other.m_Size = 0;
+      other.m_Data = nullptr;
+    
+    }
+
+  */
+
+  /*
+	MOVE ASSIGNMENT OPERATOR
+	String& operator=(String&& other) noexcept { 
+		printf("Moved Assingment Operator\n");
+		if(this != &other){
+			delete[] m_Data; 
+			m_Size = other.m_Size;
+			m_Data = other.m_Data; 
+
+			other.m_Size = 0;
+			other.m_Data = nullptr;
+		}
+		return *this;
+	}
+
+  */
+
   ~String(){
     printf("Deleted\n");
-    delete m_Data;
+    delete[] m_Data;
   }
 
   void Print(){
@@ -2606,4 +2639,116 @@ Created!
 Moved!
 Deleted!
 Vayun
+
+
+std::move and the Move Assignment Operator in C++:
+
+Lets talk about std::move, lets take the class String and Entity which we have defined abouve, and the String class has a MOVE CONSTRUCTOR.
+
+int main(){
+
+  Entity entity("Vayun");
+  entity.PrinName();  
+
+  String string = "Hello"; // What if I want to move this string to a destination.
+  // String dest = string; If I do it like this, it is creating a copy of the string.
+  // If we want the String class to use the MOVE CONSTRUCTOR we need to send "string" as a temporary/rvalue. We will have to type cast it.
+  // String dest = (String&&)string; What is happening here is that now we are constructing a new string with a constructor that takes in a string rvalue reference.
+  // This is not too elegant and it won't work with some data types like auto, so we use somthing slightly more flexible.
+  
+  String dest(std::move(string)); // or we can write String dest = std::move(string);
+  dest = std::move(string); // In this case the assingment operator will be called.
+
+}
+
+
+std::move is a utility function provided to us by the standard C++ library, that will basically do the type cast in a slightly more elegant and flexible way.
+
+dest is a brand new object which is being constructed here. 
+The assignment operator only gets called when we actually assign a variable into an existing variable. 
+
+Lets write the MOVE Assignment Operator
+
+String& operator=(String&& other) noexcept { 
+
+	printf("Moved Assingment\n");
+
+	delete[] m_Data; 
+
+	m_Size = other.m_Size;
+	m_Data = other.m_Data; 
+
+	other.m_Size = 0;
+	other.m_Data = nullptr;
+
+}
+
+In the assignment operator we will be overwriting the current object, but the object will already have some memory allocated for itself.
+So before moving data from "other" to the current object we need to delete the memory allocated to the current object to avoid memory leaks.
+
+But what if we do dest = std::move(dest); , then the MOVE Assignment Operator will not work as intended as will have deleted the data we want to assign.
+So we just write an if condition so we only do the move when they are not the same object.
+
+String& operator=(String&& other) noexcept { 
+
+	printf("Moved Assingment Operator!\n");
+
+	if(this != &other){
+		delete[] m_Data; 
+		m_Size = other.m_Size;
+		m_Data = other.m_Data; 
+
+		other.m_Size = 0;
+		other.m_Data = nullptr;
+
+	}
+
+	return *this;
+
+}
+
+We should add this function to the String Class.
+
+int main(){
+
+	String apple = "Apple";
+	String dest;
+	
+	std::cout << "Apple: ";
+	apple.Print();
+	std::cout << "Dest: ";
+	dest.Print();
+	
+	// dest = apple; will cause an error here because we don't have a copy assingment operator. 
+	dest = std::move(apple); 
+
+	std::cout << "Apple: ";
+	apple.Print();
+	std::cout << "Dest: ";
+	dest.Print();
+
+}
+
+
+The output will be:
+
+Created!
+Apple: Apple
+Dest: 
+Moved Assingment Operator!
+Apple: 
+Dest: Apple
+
+In summary the MOVE ASSIGNMENT OPERATOR is something you want to include in your class when you include a MOVE CONSTRUCTOR. 
+It is basically a part of something called the RULE OF FIFTHS' and there is something called the RULE OF THIRDS' too.  
+
+Also one important distinction you need to make is that
+
+String dest = std::move("Apple"); // This calls the MOVE CONSTRUCTOR
+while
+dest = std::move("Apple"); // This calls the MOVE ASSINGMENT OPERATOR (which is a function);
+It is the same as writing
+dest.operator=(std::move("Apple"));
+
+And std::move is what you wanna do when you want to convert an object to be a temporary. 
 
