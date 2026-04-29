@@ -215,7 +215,7 @@ class Example{
       cout<<"created an example\n";
     }
     Example(int x){
-      cout<<"created an example with "<<x<<"!"<<'\n';
+      cout<<"created an example with "<< x<<"!"<<'\n';
     }
 }
 
@@ -807,7 +807,7 @@ A static local variable allows us to declare a variable that has a lifetime of o
 void Function(){
   static int i = 0;
   i++;
-  std::cout<<i<<std::endl;
+  std::cout<< i << std::endl;
 }
 
 int main(){
