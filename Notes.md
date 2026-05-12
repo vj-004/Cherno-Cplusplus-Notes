@@ -2279,7 +2279,7 @@ The threshold lenght which we are talking about can vary according to the C++ ST
 
 void* operator new(size_t size){
   
-  std::cout << " Allocating: " << size << "bytes\n;
+  std::cout << " Allocating: " << size << "bytes\n";
   return malloc(size);
 
 }
